@@ -105,3 +105,4 @@ node tests/test-donnees.js && node tests/test-parcours.js   (dans un autre termi
 | v-trac | 4 oct. 2026 | 1 (`pp24`) | Version de Yann, avec le volet Trac |
 | 1.0.0 | nov. 2026 | 2 | Données versionnées, conversion de `pp24`, copies de secours, sauvegarde fichier avec aperçu, stockage durable, polices hébergées avec l'application, numéro de version dans les Réglages |
 | 1.1.0 | nov. 2026 | 2 | Accès réservé au parcours (code de test, lien d'accès), volet Trac libre, utilisateurs existants déverrouillés, écrans « Mes notes » et « Vos données » (avec « Tout effacer »), rappel doux de sauvegarde, mode test, textes d'accueil mis à jour, partage du livre au lieu de l'application. Champs ajoutés sans changer de schéma : `acces`, `reglages.rappelSauvegardeMasque`. |
+| 1.1.1 | nov. 2026 | 2 | Icône et nom « MG test » pour distinguer la version de travail. **À remettre avant la mise en ligne pour les lecteurs.** |

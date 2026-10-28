@@ -1,7 +1,7 @@
 /* Micro-gestes : fonctionnement hors connexion
    À chaque nouvelle version publiée, changer V pour la même valeur que APP_VERSION (index.html).
    Changer V vide l'ancien cache des fichiers. Les données des utilisateurs (localStorage) ne sont pas touchées. */
-var V='mg-1.1.0';
+var V='mg-1.1.1';
 var FILES=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','icon-maskable-512.png','apple-touch-icon.png','favicon-32.png',
   'fonts/playfair-display-latin-500-normal.woff2','fonts/playfair-display-latin-600-normal.woff2',
   'fonts/dm-sans-latin-400-normal.woff2','fonts/dm-sans-latin-500-normal.woff2'];
