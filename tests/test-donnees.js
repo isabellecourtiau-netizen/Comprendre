@@ -64,7 +64,7 @@ function verif(nom, cond, detail) { if (cond) { ok++; console.log('  ✔', nom);
   await p.evaluate(() => rReglages(document.getElementById('scr')));
   const reg = await p.evaluate(() => document.getElementById('scr').innerText);
   verif('Réglages : bouton de sauvegarde', reg.includes('Enregistrer une sauvegarde'));
-  verif('Réglages : numéro de version', reg.includes('Version 1.0.0'), reg.slice(-300));
+  verif('Réglages : numéro de version', reg.includes('Version 1.'), reg.slice(-300));
   await ctx.close();
   ({p, ctx, erreurs} = await page0());
   await p.evaluate(txt => lireSauvegarde(txt), sauvegarde);

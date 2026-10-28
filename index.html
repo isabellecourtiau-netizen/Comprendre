@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Micro-gestes</title>
-<meta name="description" content="Vingt-huit jours, quelques micro-gestes par jour. Une application gratuite de Yann Riguidel, praticien en hypnose.">
+<meta name="description" content="Vingt-huit jours, quelques micro-gestes par jour, d’après le livre Comprendre ne suffit pas de Yann Riguidel, praticien en hypnose.">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#2A2E42">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="favicon-32.png" sizes="32x32">
 <meta property="og:title" content="Micro-gestes">
-<meta property="og:description" content="Vingt-huit jours, quelques micro-gestes par jour. Gratuit, sans compte, rien n'est envoyé.">
+<meta property="og:description" content="Vingt-huit jours de micro-gestes pour les lecteurs du livre, et un volet libre pour gérer le trac.">
 <meta property="og:image" content="icon-512.png">
 <meta property="og:type" content="website">
 <style>
@@ -60,6 +60,7 @@ button:focus-visible,a:focus-visible,textarea:focus-visible,input:focus-visible{
 .thumb.on{background:var(--navy);color:var(--cream);border-color:var(--navy)}
 .mini.info{width:30px;height:30px;padding:0;border-radius:50%;font-size:13px;color:var(--muted);line-height:1}
 textarea{width:100%;border:1px solid var(--bd);border-radius:12px;background:var(--surf);color:var(--ink);font-family:inherit;font-size:16px;line-height:1.6;padding:11px;resize:vertical}
+input[type=text]{width:100%;border:1px solid var(--bd);border-radius:12px;background:var(--surf);color:var(--ink);font-family:inherit;font-size:16px;line-height:1.4;padding:12px;letter-spacing:.08em}
 .tabbar{position:absolute;bottom:0;left:0;right:0;display:flex;background:var(--surf2);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom)}
 .tab{flex:1;text-align:center;padding:11px 0 13px;font-size:10.5px;color:var(--muted);cursor:pointer;border-top:2px solid transparent}
 .tab.on{color:var(--navy);font-weight:500;border-top-color:var(--gold)}
@@ -135,7 +136,8 @@ var CFG={
   site:'https://yannriguidelhypnose.fr',
   livre:'https://yannriguidelhypnose.fr',   // ← remplacer par l'URL Amazon du livre
   appUrl:'https://micro-gestes.netlify.app',// ← l'URL publique de l'appli
-  ville:'Lorient'
+  ville:'Lorient',
+  codeTest:'LECTEUR2026' // ← code d'accès de la phase de test (sera remplacé par le formulaire)
 };
 
 var S={scr:'w',tab:'j',parcours:null,deg:3,mode:'rdv',day:1,done:[],memos:{},fb:{},fbd:{},releve:{},remind:'08:00',q:[],qi:0,qorder:null,vday:null,qhist:[],seuils:[],fin:0,cycle:1,arch:[]};
@@ -144,12 +146,12 @@ var S={scr:'w',tab:'j',parcours:null,deg:3,mode:'rdv',day:1,done:[],memos:{},fb:
    Règles : on n'efface jamais une ancienne clé ; toute conversion passe par
    MIGR ; on ne remplace jamais des données plus récentes que l'application.
    ===================================================================== */
-var APP_VERSION='1.0.0', SCHEMA=2, CLE='mg-donnees', CLE_ANCIENNE='pp24';
+var APP_VERSION='1.1.0', SCHEMA=2, CLE='mg-donnees', CLE_ANCIENNE='pp24';
 /* Champs d'écran : jamais enregistrés ni exportés */
 var EPHEMERES=['scr','tab','q','qi','qorder','vday','again','ans','exaequo','finalistes','second','tour','sc','sc1'];
 /* Champs rangés dans l'enveloppe */
 var RANGES=['persoL','parcours','deg','mode','day','done','memos','fb','fbd','releve','remind','seuils','fin','cycle','arch','qhist'];
-var META={creeLe:null,derniereSauvegarde:null,acces:null,migreDe:null};
+var META={creeLe:null,derniereSauvegarde:null,acces:null,migreDe:null,rappelMasque:null};
 var BLOQUE_ECRITURE=false, ALERTE_DONNEES=null;
 
 function maintenant(){return new Date().toISOString();}
@@ -163,7 +165,7 @@ function enveloppeDepuis(d,meta){
     format:'micro-gestes',schema:SCHEMA,appVersion:APP_VERSION,
     creeLe:meta.creeLe||maintenant(),modifieLe:maintenant(),migreDe:meta.migreDe||null,
     acces:meta.acces||null,
-    reglages:{rythme:d.mode||'rdv',heureRdv:d.remind||'08:00',degre:d.deg||3,derniereSauvegarde:meta.derniereSauvegarde||null},
+    reglages:{rythme:d.mode||'rdv',heureRdv:d.remind||'08:00',degre:d.deg||3,derniereSauvegarde:meta.derniereSauvegarde||null,rappelSauvegardeMasque:meta.rappelMasque||null},
     cycleEnCours:{numero:d.cycle||1,parcours:d.parcours||null,jour:d.day||1,
       gestesFaits:Array.isArray(d.done)?d.done:[],notes:d.memos||{},
       avisGestes:d.fb||{},avisGestesJour:d.fbd||{},releve:d.releve||{},
@@ -202,11 +204,13 @@ function appliquer(e){
   var d=aplatir(e);for(var k in d)S[k]=d[k];
   META.creeLe=e.creeLe||null;META.acces=e.acces||null;META.migreDe=e.migreDe||null;
   META.derniereSauvegarde=(e.reglages&&e.reglages.derniereSauvegarde)||null;
+  META.rappelMasque=(e.reglages&&e.reglages.rappelSauvegardeMasque)||null;
   if(S.parcours)S.scr='home';
 }
 function enveloppeActuelle(){return enveloppeDepuis(S,META);}
 function sv(){
   if(BLOQUE_ECRITURE)return;
+  if(S.parcours&&!(META.acces&&META.acces.deverrouille))META.acces={deverrouille:true,methode:'utilisateur-existant',le:maintenant()};
   try{var e=enveloppeActuelle();META.creeLe=e.creeLe;localStorage.setItem(CLE,JSON.stringify(e));}catch(err){}
 }
 function ld(){
@@ -594,6 +598,9 @@ function render(){
   if(S.scr==='mode')return rMode(s);
   if(S.scr==='fin')return rFin(s);
   if(S.scr==='trac')return rTrac(s);
+  if(S.scr==='acces')return rAcces(s);
+  if(S.scr==='notes')return rNotes(s);
+  if(S.scr==='donnees')return rDonnees(s);
   if(S.scr==='home'){nav();if(S.tab==='j')return rJ(s);if(S.tab==='p')return rParcours(s);if(S.tab==='t')return rTrac(s);if(S.tab==='r')return rReglages(s);}
 }
 function go(x){S.scr=x;window.scrollTo(0,0);render();}
@@ -611,8 +618,9 @@ function rW(s){$('nav').innerHTML='';
   '<div class="card" style="margin-bottom:14px"><p style="font-size:13.5px;color:#5f5a4d;line-height:1.75;margin:0">'+
   'Comprendre ce qui coince ne suffit pas à le changer. Ce qui change quelque chose, c’est un geste assez petit pour être fait un jour où vous n’avez envie de rien.<br><br>'+
   'Vous répondez à une douzaine d’affirmations, puis à quelques-unes de plus sur ce qui vous concerne. L’application vous propose alors un point de départ. Ensuite, chaque jour, deux ou trois gestes courts sur le corps, les pensées, l’environnement. Aucun score, aucune série à ne pas casser.</p></div>'+
-  '<div class="note" style="margin-bottom:22px">Gratuit, sans compte, sans publicité. Ce que vous notez reste sur cet appareil : rien n’est envoyé nulle part.</div>'+
-  '<button class="btn bp" onclick="startQuiz()">Commencer</button>'+
+  '<div class="note" style="margin-bottom:22px">Le parcours des 28 jours est offert aux lecteurs du livre. Le volet Trac est libre d’accès. Vos notes et vos ressentis restent sur cet appareil\u202F: ils ne sont jamais envoyés. <a class="lk" onclick="go(\'donnees\')" style="text-decoration:underline">Vos données</a></div>'+
+  '<button class="btn bp" onclick="exigerAcces(\'quiz\')">Commencer</button>'+
+  '<button class="btn bs" onclick="go(\'trac\')">Gérer le trac</button>'+
   '<button class="btn bs" id="installBtn" style="display:none" onclick="doInstall()">Installer sur mon téléphone</button>'+
   (IS_IOS&&!STANDALONE&&!IN_APP?'<button class="btn bs" onclick="iosHelp()">Installer sur mon téléphone</button>':'')+
   '<div class="sep"></div>'+
@@ -632,7 +640,7 @@ function rAide(s){$('nav').innerHTML='';
   s.innerHTML='<div class="pad fi"><div style="height:24px"></div>'+
   '<h2 style="font-size:23px;margin-bottom:16px">Reprendre ou choisir</h2>'+
   '<div class="card"><p style="font-size:13.5px;color:#5f5a4d;margin:0 0 10px;line-height:1.6">Vous savez déjà ce sur quoi vous voulez travailler ? Choisissez directement votre parcours, sans passer par les questions.</p>'+
-  '<button class="mini" onclick="go(\'pick\')">Voir les douze parcours</button></div>'+
+  '<button class="mini" onclick="exigerAcces(\'pick\')">Voir les douze parcours</button></div>'+
   '<div class="card"><p style="font-size:13.5px;color:#5f5a4d;margin:0 0 10px;line-height:1.6">Vous aviez commencé sur un autre appareil, ou vos données ont été effacées ? Collez le code de reprise que vous aviez gardé.</p>'+
   '<textarea id="codeIn" rows="3" placeholder="Votre code…"></textarea>'+
   '<button class="mini" style="margin-top:8px" onclick="doRestore()">Restaurer mon parcours</button></div>'+
@@ -886,7 +894,7 @@ function rJ(s){
     (S.day>1?'<button class="btn bs" style="font-size:13px;padding:11px" onclick="viewDay('+(S.day-1)+')">Voir un jour précédent</button>':'')+
     '</div>';
   }
-  s.innerHTML='<div class="pad fi">'+(isPast?banner:coachLine())+head+degbar+gh+notes+actions+'</div>';
+  s.innerHTML='<div class="pad fi">'+(isPast?'':rappelSauvegarde())+(isPast?banner:coachLine())+head+degbar+gh+notes+actions+'</div>';
 }
 /* Relevé du jour : une touche, cinq états, jamais obligatoire.
    Aucun chiffre n'est montré à l'utilisateur, ici ni ailleurs. */
@@ -1037,7 +1045,7 @@ function rFin(s){$('nav').innerHTML='';
   (peutComparer()?'<button class="btn bs" onclick="go(\'compare\')">Revoir ma comparaison</button>':'')+
   '<button class="btn bp" onclick="S.scr=\'home\';S.tab=\'j\';sv();render()">Revenir à mon parcours</button>'+
   '<button class="btn bs" onclick="go(\'pick2\')">Commencer un autre parcours</button>'+
-  '<button class="btn bs" onclick="partager()">Offrir l’application à quelqu’un</button>'+
+  '<button class="btn bs" onclick="partager()">Faire connaître le livre</button>'+
   '<div class="sep"></div>'+
   '<div class="card"><p class="lbl" style="margin-bottom:9px">Pour aller plus loin</p>'+
   '<p style="font-size:13.5px;color:#5f5a4d;line-height:1.7;margin:0 0 12px">Cette application est tirée de <i>Comprendre ne suffit pas</i>, où j’explique d’où viennent ces gestes, pourquoi la volonté échoue si souvent, et comment repérer vos propres seuils. Et si vous voulez travailler cela avec quelqu’un, je reçois en cabinet à '+CFG.ville+'.</p>'+
@@ -1045,10 +1053,10 @@ function rFin(s){$('nav').innerHTML='';
   '<p class="sig" style="margin:12px 0 0">Yann Riguidel, praticien en hypnose</p></div></div>';
 }
 function partager(){
-  var d={title:'Micro-gestes',text:'Vingt-huit jours, quelques micro-gestes par jour. Gratuit, sans compte.',url:CFG.appUrl};
+  var d={title:'Comprendre ne suffit pas',text:'Le livre de Yann Riguidel, et son application Micro-gestes pour passer à la pratique.',url:CFG.livre};
   if(navigator.share){navigator.share(d).catch(function(){});}
-  else if(navigator.clipboard){navigator.clipboard.writeText(CFG.appUrl).then(function(){toast('Lien copié.');});}
-  else toast(CFG.appUrl);
+  else if(navigator.clipboard){navigator.clipboard.writeText(CFG.livre).then(function(){toast('Lien copié.');});}
+  else toast(CFG.livre);
 }
 
 /* ---------- Parcours ---------- */
@@ -1061,11 +1069,11 @@ function rParcours(s){
   var courbe=sparkline();
   s.innerHTML='<div class="pad fi"><h2 style="font-size:22px;margin-bottom:4px">Votre parcours</h2>'+
   '<p class="muted" style="margin-bottom:18px">Jour '+S.day+' · Semaine '+week()+', phase '+phase()+'. Touchez un jour atteint pour le revoir.</p>'+
-  bands+courbe+fin+
+  bands+'<button class="btn bs" style="margin-top:14px" onclick="go(\'notes\')">Mes notes'+(nbNotes()?' ('+nbNotes()+')':'')+'</button>'+courbe+fin+
   '<div class="sep"></div><div class="card"><p class="lbl" style="margin-bottom:8px">L’esprit du parcours</p>'+
   '<p style="font-size:13px;color:#5f5a4d;line-height:1.7;margin:0">Les gestes changent chaque semaine, pour épouser la phase du moment. Un jour sauté ne se rattrape pas : vous reprenez simplement le lendemain. Le corps note tout — les effets viennent souvent après.</p></div>'+
   '<div class="card" style="margin-top:8px"><p class="lbl" style="margin-bottom:8px">D’où vient tout ceci</p>'+
-  '<p style="font-size:13px;color:#5f5a4d;line-height:1.7;margin:0 0 12px">Cette application est la mise en pratique de <i>Comprendre ne suffit pas</i>, de Yann Riguidel. La théorie complète y est : pourquoi comprendre son fonctionnement ne le change pas, d’où viennent les micro-gestes, et comment repérer les seuils qui sont les vôtres. Rien à acheter pour continuer ici — l’application reste entièrement gratuite.</p>'+
+  '<p style="font-size:13px;color:#5f5a4d;line-height:1.7;margin:0 0 12px">Cette application est la mise en pratique de <i>Comprendre ne suffit pas</i>, de Yann Riguidel. La théorie complète y est : pourquoi comprendre son fonctionnement ne le change pas, d’où viennent les micro-gestes, et comment repérer les seuils qui sont les vôtres. Le parcours est offert aux lecteurs du livre.</p>'+
   '<div class="gact"><a class="mini g" href="'+CFG.livre+'" target="_blank" rel="noopener">Voir le livre</a><a class="mini" href="'+CFG.site+'" target="_blank" rel="noopener">Le cabinet</a></div></div></div>';
 }
 
@@ -1113,7 +1121,10 @@ function rReglages(s){
   (peutComparer()?'<button class="mini g" onclick="go(\'compare\')">Voir ma comparaison</button>':'')+'</div></div>'+
   '<div class="sep"></div><p class="lbl" style="margin-bottom:10px">Vos notes</p>'+
   '<div class="card"><p style="font-size:13px;color:#5f5a4d;line-height:1.6;margin:0 0 10px">Vos notes et la trace de vos gestes, à garder pour vous.</p>'+
-  '<div class="gact"><button class="mini" onclick="exportNotes(\'txt\')">Exporter .txt</button><button class="mini" onclick="exportNotes(\'md\')">Exporter .md</button></div></div>'+
+  '<div class="gact"><button class="mini g" onclick="go(\'notes\')">Voir mes notes</button><button class="mini" onclick="exportNotes(\'txt\')">Exporter .txt</button><button class="mini" onclick="exportNotes(\'md\')">Exporter .md</button></div></div>'+
+  '<div class="sep"></div><p class="lbl" style="margin-bottom:10px">Vos données</p>'+
+  '<div class="card"><p style="font-size:13px;color:#5f5a4d;line-height:1.6;margin:0 0 10px">Ce qui reste sur ce téléphone, ce qui est envoyé, et comment tout effacer.</p>'+
+  '<button class="mini" onclick="go(\'donnees\')">Vos données</button></div>'+
   '<div class="sep"></div><p class="lbl" style="margin-bottom:10px">Sauvegarde</p>'+
   '<div class="card"><p style="font-size:13px;color:#5f5a4d;line-height:1.6;margin:0 0 10px">Un fichier qui contient tout\u202F: parcours, jours, notes, relevés. Rangez-le où vous voulez (Fichiers, Drive…) pour retrouver vos données sur un nouveau téléphone ou après un effacement.</p>'+
   '<p class="muted" style="font-size:12.5px;margin:0 0 10px">'+texteDerniereSauvegarde()+'</p>'+
@@ -1124,9 +1135,10 @@ function rReglages(s){
   '<button class="mini" style="margin-top:8px" onclick="copyCode()">Copier mon code</button></div>'+
   inst+
   '<div class="sep"></div><p class="lbl" style="margin-bottom:10px">À propos</p>'+
-  '<div class="card"><p style="font-size:13px;color:#5f5a4d;line-height:1.7;margin:0 0 12px">Micro-gestes est une application gratuite, sans compte et sans publicité, conçue par <b>Yann Riguidel</b>, praticien en hypnose à '+CFG.ville+'. Elle met en pratique <i>Comprendre ne suffit pas</i>, son livre sur la méthode des micro-gestes.</p>'+
-  '<div class="gact"><a class="mini g" href="'+CFG.livre+'" target="_blank" rel="noopener">Le livre</a><a class="mini" href="'+CFG.site+'" target="_blank" rel="noopener">Le cabinet</a><button class="mini" onclick="partager()">Partager</button></div></div>'+
-  '<p class="muted" style="font-size:12px;margin:10px 0 0;text-align:center">Version '+APP_VERSION+' · données au format '+SCHEMA+'</p>'+
+  '<div class="card"><p style="font-size:13px;color:#5f5a4d;line-height:1.7;margin:0 0 12px">Micro-gestes est une application sans publicité, conçue par <b>Yann Riguidel</b>, praticien en hypnose à '+CFG.ville+'. Elle met en pratique <i>Comprendre ne suffit pas</i>, son livre sur la méthode des micro-gestes. Le parcours est offert à ses lecteurs.</p>'+
+  '<div class="gact"><a class="mini g" href="'+CFG.livre+'" target="_blank" rel="noopener">Le livre</a><a class="mini" href="'+CFG.site+'" target="_blank" rel="noopener">Le cabinet</a><button class="mini" onclick="partager()">Faire connaître le livre</button></div></div>'+
+  '<p class="muted" style="font-size:12px;margin:10px 0 0;text-align:center" onclick="toucheVersion()">Version '+APP_VERSION+' · données au format '+SCHEMA+'</p>'+
+  blocModeTest()+
   '<div class="note" style="margin-top:10px">Cette application n’est pas un soin et ne remplace pas un avis médical. En cas de souffrance importante, parlez-en à un professionnel de santé.</div>'+
   '<button class="btn bs" style="margin-top:14px" onclick="go(\'pick\')">Changer de parcours</button></div>';
 }
@@ -1149,6 +1161,154 @@ function exportNotes(fmt){
   var blob=new Blob([L.join('\n')],{type:'text/plain;charset=utf-8'}),u=URL.createObjectURL(blob),a=document.createElement('a');
   a.href=u;a.download='micro-gestes-notes.'+(md?'md':'txt');document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u)},800);
 }
+
+/* ---------- Accès réservé aux lecteurs ----------
+   Phase de test : un code d'accès. Phase 3 : un formulaire (e-mail + question
+   sur le livre) qui envoie un lien d'accès. Le volet Trac reste toujours libre. */
+var ACCES_SUITE=null;
+function accesOK(){return !!(META.acces&&META.acces.deverrouille);}
+function exigerAcces(suite){
+  if(accesOK())return continuerApresAcces(suite);
+  ACCES_SUITE=suite;go('acces');
+}
+function continuerApresAcces(suite){
+  if(suite==='pick')return go('pick');
+  return startQuiz();
+}
+function normaliserCode(c){return String(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'');}
+function codeValide(c){return !!c&&normaliserCode(c)===normaliserCode(CFG.codeTest);}
+function deverrouiller(methode){META.acces={deverrouille:true,methode:methode,le:maintenant()};sv();}
+function validerCode(){
+  var el=$('accesIn'),c=el?el.value:'';
+  if(!codeValide(c)){toast('Ce code n’est pas reconnu.');return;}
+  deverrouiller('code-test');toast('Bienvenue dans le parcours.');
+  var suite=ACCES_SUITE;ACCES_SUITE=null;continuerApresAcces(suite);
+}
+/* Lien d'accès : …/#acces=CODE (prépare le lien envoyé par e-mail en phase 3) */
+function lienAcces(){
+  var m=/^#acces=([^&]+)/.exec(location.hash||'');if(!m)return;
+  var c=decodeURIComponent(m[1]);
+  try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
+  if(accesOK())return;
+  if(codeValide(c)){deverrouiller('lien');setTimeout(function(){toast('Accès ouvert. Bienvenue.');},700);}
+  else setTimeout(function(){toast('Ce lien d’accès n’est pas reconnu.');},700);
+}
+function rAcces(s){$('nav').innerHTML='';
+  s.innerHTML='<div class="pad fi"><div style="height:24px"></div>'+mark()+
+  '<h2 style="font-size:25px;margin-bottom:12px;text-align:center">Le parcours des 28 jours</h2>'+
+  '<p class="muted" style="text-align:center;margin:0 0 20px">Ce parcours accompagne le livre <i>Comprendre ne suffit pas</i>. Il est offert à ses lecteurs.</p>'+
+  '<div class="card"><p class="lbl" style="margin-bottom:8px">Code d’accès</p>'+
+  '<p style="font-size:13.5px;color:#5f5a4d;line-height:1.6;margin:0 0 10px">Saisissez le code d’accès que vous avez reçu.</p>'+
+  '<input id="accesIn" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Votre code" style="width:100%">'+
+  '<button class="btn bp" style="margin-top:12px" onclick="validerCode()">Accéder au parcours</button></div>'+
+  '<div class="card" style="margin-top:8px"><p style="font-size:13.5px;color:#5f5a4d;line-height:1.6;margin:0 0 10px">Le volet Trac reste libre d’accès : respirations guidées et rituel de coulisses.</p>'+
+  '<div class="gact"><button class="mini g" onclick="go(\'trac\')">Gérer le trac</button><a class="mini" href="'+CFG.livre+'" target="_blank" rel="noopener">Découvrir le livre</a></div></div>'+
+  '<button class="btn bs" style="margin-top:10px" onclick="go(\'w\')">Retour</button></div>';
+}
+
+/* ---------- Mes notes ---------- */
+function notesDe(memos){var l=[];for(var k in (memos||{})){var v=String(memos[k]||'').trim();if(v)l.push([+k,v]);}l.sort(function(a,b){return a[0]-b[0]});return l;}
+function nbNotes(){var n=notesDe(S.memos).length;(S.arch||[]).forEach(function(a){n+=notesDe(a.memos).length;});return n;}
+function carteNote(d,txt,releve,ouvrable){
+  var tag=(releve&&typeof releve[d]==='number')?' <span class="muted" style="font-size:12.5px">· journée : '+REL[releve[d]].toLowerCase()+'</span>':'';
+  return '<div class="card"><p class="lbl" style="margin-bottom:6px">Jour '+d+tag+'</p>'+
+  '<p style="font-size:14px;line-height:1.65;margin:0;white-space:pre-wrap">'+esc(txt)+'</p>'+
+  (ouvrable?'<button class="mini" style="margin-top:10px" onclick="viewDay('+d+')">Ouvrir ce jour</button>':'')+'</div>';
+}
+function rNotes(s){$('nav').innerHTML='';
+  var cur=notesDe(S.memos),h='';
+  var lb=(S.parcours&&IND[S.parcours])?IND[S.parcours].lb:'';
+  h+='<p class="lbl" style="margin:18px 0 10px">Parcours en cours'+(lb?' · '+lb:'')+'</p>';
+  h+=cur.length?cur.map(function(n){return carteNote(n[0],n[1],S.releve,n[0]<=S.day);}).join(''):
+    '<div class="note">Pas encore de note sur ce parcours. Vous pouvez écrire un mot chaque jour, en bas de l’écran du jour.</div>';
+  (S.arch||[]).slice().reverse().forEach(function(a){
+    var l=notesDe(a.memos);if(!l.length)return;
+    h+='<p class="lbl" style="margin:22px 0 10px">Cycle '+a.cycle+((a.parcours&&IND[a.parcours])?' · '+IND[a.parcours].lb:'')+'</p>';
+    h+=l.map(function(n){return carteNote(n[0],n[1],a.releve,false);}).join('');
+  });
+  s.innerHTML='<div class="pad fi"><div style="height:18px"></div>'+
+  '<h2 style="font-size:24px;margin-bottom:6px">Mes notes</h2>'+
+  '<p class="muted" style="margin:0">Toutes vos notes, jour par jour. Elles restent sur ce téléphone.</p>'+h+
+  '<div class="sep"></div><div class="gact"><button class="mini" onclick="exportNotes(\'txt\')">Exporter .txt</button><button class="mini" onclick="exportNotes(\'md\')">Exporter .md</button></div>'+
+  '<button class="btn bs" style="margin-top:14px" onclick="S.scr=S.parcours?\'home\':\'w\';S.tab=\'p\';window.scrollTo(0,0);render()">Retour</button></div>';
+}
+
+/* ---------- Vos données ---------- */
+function rDonnees(s){$('nav').innerHTML='';
+  var retour=S.parcours?"S.scr='home';S.tab='r';window.scrollTo(0,0);render()":"go('w')";
+  s.innerHTML='<div class="pad fi"><div style="height:18px"></div>'+
+  '<h2 style="font-size:24px;margin-bottom:16px">Vos données</h2>'+
+  '<div class="card"><p class="lbl" style="margin-bottom:8px">Ce qui reste sur ce téléphone</p>'+
+  '<p style="font-size:13.5px;color:#5f5a4d;line-height:1.7;margin:0">Votre parcours, vos réponses au questionnaire, vos notes, le relevé de vos journées, les gestes que vous gardez ou écartez.<br><br>'+
+  '<b>Ces informations ne sont jamais envoyées.</b> Ni Yann Riguidel ni personne d’autre n’y a accès.</p></div>'+
+  '<div class="card" style="margin-top:8px"><p class="lbl" style="margin-bottom:8px">Ce qui est envoyé</p>'+
+  '<p style="font-size:13.5px;color:#5f5a4d;line-height:1.7;margin:0">Rien. L’application ne transmet aucune information.</p></div>'+
+  '<div class="card" style="margin-top:8px"><p class="lbl" style="margin-bottom:8px">Ce que vous pouvez faire</p>'+
+  '<p style="font-size:13.5px;color:#5f5a4d;line-height:1.7;margin:0 0 10px">Enregistrer une sauvegarde pour ne rien perdre, relire ou exporter vos notes, ou tout effacer de ce téléphone.</p>'+
+  '<div class="gact">'+(S.parcours?'<button class="mini g" onclick="enregistrerSauvegarde()">Enregistrer une sauvegarde</button><button class="mini" onclick="go(\'notes\')">Mes notes</button>':'')+
+  '<button class="mini" onclick="confirmerEffacement()">Tout effacer</button></div></div>'+
+  '<button class="btn bs" style="margin-top:14px" onclick="'+retour+'">Retour</button></div>';
+}
+function confirmerEffacement(){
+  sheet('ovE','Tout effacer','Effacer vos données ?',
+  '<p style="font-size:13.5px;color:#5f5a4d;line-height:1.65;margin:0 0 12px">Votre parcours, vos notes, vos relevés et les copies de secours seront supprimés de ce téléphone. Cette action est définitive.</p>'+
+  (S.parcours?'<p style="font-size:13.5px;color:#5f5a4d;line-height:1.65;margin:0 0 12px">Si vous voulez pouvoir les retrouver, enregistrez d’abord une sauvegarde.</p>'+
+  '<button class="btn bs" onclick="closeOv(\'ovE\');enregistrerSauvegarde()">Enregistrer une sauvegarde d’abord</button>':'')+
+  '<button class="btn bp" onclick="toutEffacer()">Tout effacer définitivement</button>','Annuler');
+}
+function toutEffacer(){
+  BLOQUE_ECRITURE=true;
+  try{Object.keys(localStorage).forEach(function(k){if((k.indexOf('mg-')===0&&k!=='mg-mode-test')||k==='pp24'||k==='pp5'||k==='pp5_seed')localStorage.removeItem(k);});}catch(e){}
+  location.hash='';location.reload();
+}
+
+/* ---------- Rappel doux de sauvegarde ----------
+   Au plus une fois par semaine, à partir du 4e jour, facile à ignorer. */
+function joursDepuis(iso){return iso?(Date.now()-new Date(iso).getTime())/864e5:1e9;}
+function rappelSauvegarde(){
+  if(!S.parcours||S.day<4)return '';
+  if(joursDepuis(META.derniereSauvegarde)<7||joursDepuis(META.rappelMasque)<7)return '';
+  return '<div class="card" style="margin-bottom:14px"><p style="font-size:13.5px;color:#5f5a4d;line-height:1.6;margin:0 0 10px">Une sauvegarde de temps en temps ? Vos notes ne sont que sur ce téléphone. Un fichier de sauvegarde vous permet de les retrouver si besoin.</p>'+
+  '<div class="gact"><button class="mini g" onclick="enregistrerSauvegarde()">Enregistrer</button><button class="mini" onclick="META.rappelMasque=maintenant();sv();rJ($(\'scr\'))">Plus tard</button></div></div>';
+}
+
+/* ---------- Mode test (réservé à la maintenance) ----------
+   S'active en touchant 5 fois le numéro de version dans les Réglages,
+   ou avec ?test=1 dans l'adresse. ?test=0 le désactive. */
+function modeTest(){try{return localStorage.getItem('mg-mode-test')==='1';}catch(e){return false;}}
+function reglerModeTest(on){try{if(on)localStorage.setItem('mg-mode-test','1');else localStorage.removeItem('mg-mode-test');}catch(e){}}
+(function(){var m=/[?&]test=([01])/.exec(location.search);if(m)reglerModeTest(m[1]==='1');})();
+var TOUCHES_VERSION=0,TOUCHES_T=0;
+function toucheVersion(){
+  var n=Date.now();if(n-TOUCHES_T>1500)TOUCHES_VERSION=0;TOUCHES_T=n;TOUCHES_VERSION++;
+  if(TOUCHES_VERSION>=5){TOUCHES_VERSION=0;reglerModeTest(!modeTest());toast(modeTest()?'Mode test activé.':'Mode test désactivé.');rReglages($('scr'));}
+}
+function blocModeTest(){
+  if(!modeTest())return '';
+  return '<div class="sep"></div><p class="lbl" style="margin-bottom:10px">Mode test</p>'+
+  '<div class="card"><p style="font-size:13px;color:#5f5a4d;line-height:1.6;margin:0 0 10px">Réservé à la maintenance. Code d’accès de test : <b>'+esc(CFG.codeTest)+'</b></p>'+
+  '<div class="gact" style="flex-wrap:wrap">'+
+  '<button class="mini" onclick="testAncienUtilisateur()">Simuler un ancien utilisateur</button>'+
+  '<button class="mini" onclick="testNouveauLecteur()">Simuler un nouveau lecteur</button>'+
+  '<button class="mini" onclick="testVoirDonnees()">Voir les données</button>'+
+  '<button class="mini" onclick="testRappel()">Afficher le rappel</button>'+
+  '<button class="mini" onclick="reglerModeTest(false);rReglages($(\'scr\'))">Quitter le mode test</button></div></div>';
+}
+function testEffacerTout(){try{Object.keys(localStorage).forEach(function(k){if((k.indexOf('mg-')===0&&k!=='mg-mode-test')||k==='pp24'||k==='pp5'||k==='pp5_seed')localStorage.removeItem(k);});}catch(e){}}
+function testAncienUtilisateur(){
+  BLOQUE_ECRITURE=true;testEffacerTout();
+  var a={scr:'home',tab:'j',parcours:'rum',deg:3,mode:'rdv',day:10,done:[1,2,3,4,5,6,7,8,9],
+    memos:{'2':'Note de test du jour 2.','5':'Note de test du jour 5,\nsur deux lignes.','9':'Note de test du jour 9.'},
+    fb:{},fbd:{},releve:{'2':1,'5':3,'9':2},remind:'08:00',q:[],qi:0,qorder:null,vday:null,qhist:[],seuils:[1],fin:0,cycle:1,arch:[]};
+  try{localStorage.setItem('pp24',JSON.stringify(a));}catch(e){}
+  location.reload();
+}
+function testNouveauLecteur(){BLOQUE_ECRITURE=true;testEffacerTout();location.hash='';location.reload();}
+function testVoirDonnees(){
+  var brut='';try{brut=localStorage.getItem(CLE)||'(vide)';try{brut=JSON.stringify(JSON.parse(brut),null,1);}catch(e){}}catch(e){}
+  sheet('ovT2','Mode test','Données enregistrées','<pre style="font-size:11px;white-space:pre-wrap;word-break:break-word;max-height:55vh;overflow:auto;background:#fff;border-radius:10px;padding:10px">'+esc(brut)+'</pre>');
+}
+function testRappel(){META.derniereSauvegarde=null;META.rappelMasque=null;if(S.parcours&&S.day<4)S.day=4;sv();S.scr='home';S.tab='j';render();}
 
 /* ---------- Sauvegarde complète (fichier) ---------- */
 function nomFichierSauvegarde(){var d=new Date(),z=function(n){return (n<10?'0':'')+n};return 'micro-gestes-sauvegarde-'+d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())+'.json';}
@@ -1401,6 +1561,7 @@ function trGo(){
 function trEnd(){brStop();var o=$('ovP');if(o)o.remove();}
 
 ld();
+lienAcces();
 demanderStockageDurable();
 if(ALERTE_DONNEES)setTimeout(function(){toast(ALERTE_DONNEES);},600);
 if(/^#trac/.test(location.hash)){if(S.scr==='home')S.tab='t';else S.scr='trac';}
