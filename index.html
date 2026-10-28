@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Micro-gestes</title>
+<meta name="description" content="Vingt-huit jours, quelques micro-gestes par jour. Une application gratuite de Yann Riguidel, praticien en hypnose.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2A2E42">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Micro-gestes">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="favicon-32.png" sizes="32x32">
+<meta property="og:title" content="Micro-gestes">
+<meta property="og:description" content="Vingt-huit jours, quelques micro-gestes par jour. Gratuit, sans compte, rien n'est envoyé.">
+<meta property="og:image" content="icon-512.png">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#2A2E42;--cream:#F4F1EA;--surf:#EDE8DC;--surf2:#fff;--gold:#C4973A;--ink:#2A2E42;--muted:#8c8676;--bd:#e3ddd0;
+--C:#0F6E56;--P:#4038A0;--E:#9C5A1F;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#d8d3c6;font-family:'DM Sans',system-ui,sans-serif;color:var(--ink);line-height:1.55}
+#app{max-width:420px;margin:0 auto;min-height:100vh;min-height:100dvh;background:var(--cream);position:relative;overflow:hidden}
+h1,h2,h3{font-family:'Playfair Display',serif;font-weight:600;color:var(--navy);margin:0}
+.pad{padding:22px 20px 110px;padding-bottom:calc(110px + env(safe-area-inset-bottom))}
+.fi{animation:fi .35s ease}@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.lbl{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0}
+.muted{color:var(--muted);font-size:14px}
+.btn{display:block;width:100%;border:none;border-radius:100px;padding:14px;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;margin-bottom:8px}
+.bp{background:var(--navy);color:var(--cream)}
+.bs{background:transparent;color:var(--navy);border:1px solid var(--bd)}
+.bs:active,.bp:active{transform:scale(.985)}
+button:focus-visible,a:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.chip{font-size:11px;font-weight:500;padding:3px 11px;border-radius:100px;background:#EFE3C8;color:#7a5c1a}
+.card{background:var(--surf2);border:1px solid var(--bd);border-radius:14px;padding:14px 15px;margin-bottom:10px}
+.opt{width:100%;text-align:left;background:var(--surf2);border:1px solid var(--bd);border-radius:12px;padding:13px 15px;margin-bottom:8px;font-family:inherit;font-size:14px;cursor:pointer;color:var(--ink)}
+.opt.sel{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.opt b{display:block;font-size:15px;color:var(--navy);margin-bottom:2px}
+.opt span{font-size:13px;color:var(--muted)}
+.gest .gh{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px}
+.gest .gn{font-size:11px;letter-spacing:.5px;text-transform:uppercase;font-weight:500;display:flex;align-items:center;gap:0}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;flex:none}
+.ben{font-size:12.5px;color:#6a6456;line-height:1.55;margin:0 0 10px;padding-top:9px;border-top:1px solid #efe9dc}
+.ben b{color:#7a5c1a;font-weight:500}
+.degbar{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.degbar .lbl{margin:0;white-space:nowrap}
+.degbar .seg{flex:1;margin:0}
+.dur{font-size:11px;font-weight:500;color:var(--gold);white-space:nowrap}
+.gtx{font-size:13.5px;color:#3a3a38;margin:0 0 8px}
+.gact{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.mini{font-size:12px;border:1px solid var(--bd);background:transparent;border-radius:100px;padding:6px 12px;cursor:pointer;font-family:inherit;color:var(--navy)}
+.mini.g{border-color:var(--gold);color:#7a5c1a}
+.thumb{border:1px solid var(--bd);background:transparent;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:13px;line-height:1}
+.thumb.on{background:var(--navy);color:var(--cream);border-color:var(--navy)}
+.mini.info{width:30px;height:30px;padding:0;border-radius:50%;font-size:13px;color:var(--muted);line-height:1}
+textarea{width:100%;border:1px solid var(--bd);border-radius:12px;background:var(--surf);color:var(--ink);font-family:inherit;font-size:16px;line-height:1.6;padding:11px;resize:vertical}
+.tabbar{position:absolute;bottom:0;left:0;right:0;display:flex;background:var(--surf2);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom)}
+.tab{flex:1;text-align:center;padding:11px 0 13px;font-size:10.5px;color:var(--muted);cursor:pointer;border-top:2px solid transparent}
+.tab.on{color:var(--navy);font-weight:500;border-top-color:var(--gold)}
+.tab b{display:block;font-size:17px;line-height:1;margin-bottom:3px;font-family:inherit;font-weight:400}
+.fab{position:absolute;bottom:78px;right:16px;bottom:calc(78px + env(safe-area-inset-bottom));width:54px;height:54px;border-radius:50%;background:#8B2500;color:#fff;border:none;font-size:11px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:5}
+.ov{position:absolute;inset:0;background:rgba(20,22,32,.55);display:flex;align-items:flex-end;z-index:20}
+.sheet{background:var(--cream);width:100%;border-radius:20px 20px 0 0;padding:22px 20px;padding-bottom:calc(22px + env(safe-area-inset-bottom));max-height:88%;overflow:auto;animation:up .3s ease}
+@keyframes up{from{transform:translateY(40px)}to{transform:none}}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cd{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);background:var(--surf)}
+.cd.dn{background:var(--navy);color:var(--cream)}
+.cd.td{box-shadow:inset 0 0 0 2px var(--gold);color:var(--navy);font-weight:500}
+.cd.ft{opacity:.45}
+.phband{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin:14px 0 7px;font-weight:500}
+.coach{background:var(--navy);color:var(--cream);border-radius:14px;padding:13px 15px;margin-bottom:16px;font-size:13.5px;line-height:1.5}
+.coach .lbl{color:#b9a36a;margin-bottom:3px}
+.breathwrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 0 8px}
+.bcircle{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,#3a4060,#2A2E42);display:flex;align-items:center;justify-content:center;color:var(--cream);font-size:15px;animation:breathe 11s ease-in-out infinite}
+@keyframes breathe{0%{transform:scale(.55)}36%{transform:scale(1)}45%{transform:scale(1)}100%{transform:scale(.55)}}
+.note{background:var(--surf);border:1px solid var(--bd);border-radius:10px;padding:11px 13px;font-size:12.5px;color:#5f5a4d;line-height:1.55}
+.warn{background:#FBF0DC;border:1px solid #E4C98A;border-radius:10px;padding:12px 13px;font-size:12.5px;color:#6b5220;line-height:1.55;margin-bottom:16px}
+.seg{display:flex;gap:6px;margin-bottom:8px}
+.seg button{flex:1;border:1px solid var(--bd);background:var(--surf2);border-radius:10px;padding:11px 0;font-family:inherit;font-size:15px;font-weight:500;color:var(--navy);cursor:pointer}
+.seg button.sel{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.sep{height:1px;background:var(--bd);margin:18px 0}
+.relrow{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.rel{border:1px solid var(--bd);background:var(--surf2);border-radius:9px;padding:9px 2px;font-family:inherit;font-size:11px;line-height:1.25;color:var(--navy);cursor:pointer;min-height:46px}
+.rel.sel{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold);background:#FBF6EA}
+.brow{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.bl{font-size:11px;color:var(--muted);width:74px;flex:none}
+.btr{flex:1;height:7px;background:var(--surf);border-radius:5px;overflow:hidden}
+.bfi{height:7px;border-radius:5px;transition:width .5s ease}
+.timerow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.timerow input{border:1px solid var(--bd);border-radius:8px;background:var(--surf2);font-family:inherit;font-size:16px;padding:7px 10px;min-width:0;max-width:150px}
+.sig{font-size:12.5px;color:#6a6456;line-height:1.6}
+.sig a{color:#7a5c1a}
+a.lk{color:#7a5c1a;cursor:pointer}
+.mk{display:block;margin:0 auto 24px;width:64px;height:64px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.trh{font-size:17px;margin:22px 0 10px}
+.trrow{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer}
+.trn{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--navy);margin-bottom:2px}
+.trgo{flex:none;width:38px;height:38px;border-radius:50%;border:1.5px solid var(--gold);display:grid;place-items:center}
+.trgo svg{width:12px;height:12px;fill:var(--gold);margin-left:2px}
+.trchips{display:flex;flex-wrap:wrap;gap:8px}
+.trchip{border:1.5px solid var(--bd);background:var(--surf2);border-radius:100px;padding:8px 15px;font:inherit;font-size:14px;color:var(--navy);cursor:pointer}
+.trchip.on{background:var(--gold);border-color:var(--gold);color:#fff}
+.trtog{display:flex;gap:18px;flex-wrap:wrap;margin-top:16px;font-size:13.5px;color:var(--muted)}
+.trtog label{display:flex;align-items:center;gap:7px}.trtog input{width:18px;height:18px;accent-color:var(--gold)}
+.trp{position:fixed;top:0;bottom:0;left:0;right:0;margin:0 auto;max-width:420px;z-index:25;background:var(--cream);display:flex;flex-direction:column;align-items:center;padding:calc(18px + env(safe-area-inset-top)) 20px calc(18px + env(safe-area-inset-bottom))}
+.trpt{font-size:14px;color:var(--muted);text-align:center}
+.trstage{flex:1;width:100%;display:grid;place-items:center}
+.trring{position:relative;width:min(86vw,360px,60vh);aspect-ratio:1;display:grid;place-items:center}
+.trdisc{position:absolute;inset:0;border-radius:50%;background:#3a4060;border:3px solid var(--gold);transform:scale(.42);transition:background-color .5s,border-color .5s;will-change:transform}
+.trring.hold .trdisc{background:var(--gold)}
+.trin{position:relative;text-align:center;color:var(--cream);transition:color .5s}
+.trring.hold .trin{color:var(--navy)}
+.trw{font-family:'Playfair Display',serif;font-size:36px;font-weight:600;line-height:1.05}
+.trw.sm{font-size:21px;font-weight:500}
+.trc{font-size:20px;opacity:.75;margin-top:4px;min-height:1.3em;font-variant-numeric:tabular-nums}
+.trst{font-size:14px;color:var(--muted);min-height:22px;text-align:center;font-variant-numeric:tabular-nums}
+.trbt{display:flex;gap:10px;width:100%;margin-top:12px}.trbt .btn{margin:0}
+</style>
+</head>
+<body>
+<div id="app"><div id="scr"></div><div id="nav"></div></div>
+<script>
+/* ============================================================
+   MICRO-GESTES — v32
+   À personnaliser avant mise en ligne : les 4 lignes ci-dessous.
+   ============================================================ */
+var CFG={
+  site:'https://yannriguidelhypnose.fr',
+  livre:'https://yannriguidelhypnose.fr',   // ← remplacer par l'URL Amazon du livre
+  appUrl:'https://micro-gestes.netlify.app',// ← l'URL publique de l'appli
+  ville:'Lorient'
+};
+
+var S={scr:'w',tab:'j',parcours:null,deg:3,mode:'rdv',day:1,done:[],memos:{},fb:{},fbd:{},releve:{},remind:'08:00',q:[],qi:0,qorder:null,vday:null,qhist:[],seuils:[],fin:0,cycle:1,arch:[]};
+function sv(){try{localStorage.setItem('pp24',JSON.stringify(S))}catch(e){}}
+function ld(){try{var d=JSON.parse(localStorage.getItem('pp24')||'null');if(d&&d.parcours){for(var k in d)S[k]=d[k];S.scr='home';}}catch(e){}
+  S.vday=null;
+  if(!S.seuils)S.seuils=[];if(!S.fbd)S.fbd={};if(!S.releve)S.releve={};if(!S.arch)S.arch=[];if(!S.cycle)S.cycle=1;
+  if(S.persoL&&S.persoL.C){IND.perso={lb:'Votre sélection',sl:'Vos gestes retenus',sym:0,C:S.persoL.C,P:S.persoL.P,E:S.persoL.E};}
+  if(S.parcours&&!IND[S.parcours])S.parcours='sur';}
+
+var G={
+C02:{n:'Respiration ventrale',a:'C',c:'Une main sur le ventre. Inspirez par le nez en gonflant le ventre, expirez lentement par la bouche, plus longuement.',d:'1–2 min',br:1},
+C05:{n:'Cohérence cardiaque',a:'C',c:'Inspirez 5 secondes, expirez 5 secondes, sans pause. Laissez le rythme s’installer.',d:'3 min',br:1},
+C12:{n:'Décontraction éclair',a:'C',c:'Contractez tout le corps quelques secondes, puis relâchez d’un coup en expirant.',d:'45 sec'},
+C13:{n:'Pompage des épaules',a:'C',c:'Poings fermés, haussez les épaules en inspirant, soufflez fort en relâchant. Deux à trois fois.',d:'1 min'},
+C14:{n:'Étirement cervical',a:'C',c:'Inclinez doucement l’oreille vers l’épaule, sans la lever. Quinze secondes de chaque côté.',d:'1 min'},
+C15:{n:'Décrispation du visage',a:'C',c:'Relâchez le front, les sourcils, la mâchoire, la langue. Trente secondes.',d:'45 sec',ch:1},
+C16:{n:'Mains chaudes sur les yeux',a:'C',c:'Frottez vos paumes, posez-les en coupe sur vos yeux fermés. Vingt secondes.',d:'45 sec'},
+C17:{n:'Posture de récupération',a:'C',c:'Allongé, jambes pliées, mains sur le ventre. Respirez lentement.',d:'2 min'},
+C18:{n:'Ancrage 5-4-3-2-1',a:'C',c:'Nommez 5 choses vues, 4 entendues, 3 touchées, 2 senties, 1 goûtée.',d:'2 min',ch:1},
+C19:{n:'Étreinte papillon',a:'C',c:'Bras croisés, mains sur les épaules, tapotez en alternance gauche-droite, lentement.',d:'1 min',ch:1},
+C20:{n:'Pieds enracinés',a:'C',c:'Sentez vos appuis au sol, le poids qui descend, comme des racines.',d:'1 min',ch:1},
+C21:{n:'Balayage des appuis',a:'C',c:'Parcourez mentalement les points où votre corps touche le siège et le sol.',d:'1 min'},
+H01:{n:'Ancrage au lavage des mains',a:'C',c:'La prochaine fois que vous vous laverez les mains, sentez l’eau et relâchez les épaules.',d:'30 sec'},
+P01:{n:'« Je suis en train de penser que… »',a:'P',c:'Repérez la pensée qui pèse, reformulez : « je remarque que je pense que… ».',d:'1 min',ch:1},
+P02:{n:'Feuilles sur le ruisseau',a:'P',c:'Posez chaque pensée sur une feuille et regardez-la s’éloigner au fil de l’eau.',d:'2 min'},
+P03:{n:'Nuages dans le ciel',a:'P',c:'Vos pensées sont des nuages qui passent ; vous êtes le ciel, inchangé.',d:'2 min'},
+P04:{n:'Mot répété',a:'P',c:'Prenez un mot dur, répétez-le doucement une vingtaine de fois. Il perd son sens.',d:'1 min'},
+P05:{n:'Pensées dans les mains',a:'P',c:'Mains devant les yeux (la pensée occupe tout), puis éloignez-les lentement.',d:'2 min'},
+P06:{n:'Sas de décharge',a:'P',c:'Écrivez sans filtre ce qui occupe la tête, sans vous relire. À la fin, vous déposez — rien n’est conservé.',d:'5 min',sas:1},
+P07:{n:'Une seule priorité',a:'P',c:'Écrivez LA chose qui compte aujourd’hui. Une seule. Le reste est bonus.',d:'1 min'},
+P08:{n:'Inventaire des « urgences »',a:'P',c:'Listez trois « urgences ». Pour chacune : que se passerait-il vraiment si c’était demain ?',d:'2 min'},
+P09:{n:'Une tâche, en pleine conscience',a:'P',c:'Choisissez un geste banal et faites-le en y portant toute votre attention.',d:'2 min'},
+P10:{n:'Trois choses qui vont',a:'P',c:'Notez trois choses, même minuscules, qui ont été correctes aujourd’hui.',d:'1 min'},
+P11:{n:'Tempo ralenti',a:'P',c:'Faites votre prochaine action à moitié de votre vitesse habituelle.',d:'1–2 min'},
+P12:{n:'Phrase de permission',a:'P',c:'Dites-vous : « je n’ai pas besoin de tout faire aujourd’hui pour avoir de la valeur ».',d:'1 min'},
+E01:{n:'Objet-limite',a:'E',c:'Posez en vue un objet qui dit « stop ». Le voir, c’est respirer.',d:'1 min'},
+E02:{n:'Geste accroché à un repère',a:'E',c:'Adossez un micro-geste à un moment déjà là : « après mes clés posées, trois respirations ».',d:'1 min'},
+E03:{n:'Signal de pause',a:'E',c:'Choisissez un signal récurrent qui vous rappellera de relâcher les épaules.',d:'1 min'},
+E04:{n:'Rendre facile',a:'E',c:'Préparez le terrain du geste à l’avance : tapis déroulé, carnet ouvert.',d:'2 min'},
+E05:{n:'Rendre difficile',a:'E',c:'Pour ce qui vous happe, ajoutez un obstacle : téléphone dans une autre pièce.',d:'2 min'},
+E08:{n:'Coin de recharge',a:'E',c:'Repérez un endroit où vous vous sentez bien. Passez-y quelques minutes.',d:'1 min'},
+E09:{n:'Un élément de calme',a:'E',c:'Modifiez un détail de votre espace pour qu’il invite au repos.',d:'2 min'},
+E10:{n:'Sas de transition',a:'E',c:'Entre deux activités, accordez-vous soixante secondes de rien.',d:'1 min'},
+E11:{n:'Rituel de fin de journée',a:'E',c:'Un geste net qui marque la fin du « mode travail ».',d:'1 min'},
+E12:{n:'Couvre-feu des écrans',a:'E',c:'Trente minutes avant de dormir, plus d’écran — une activité calme.',d:'1 min'},
+C22:{n:'Le soupir physiologique',a:'C',c:'Inspirez normalement, puis ajoutez une deuxième petite inspiration par le nez pour remplir complètement les poumons. Expirez ensuite lentement et complètement par la bouche, aussi longtemps que possible. Une seule répétition suffit souvent.',d:'1 min',br:1,ch:1},
+C23:{n:'Expiration doublée',a:'C',c:'Inspirez en comptant jusqu’à quatre. Expirez en comptant jusqu’à huit. Si huit est trop long, faites trois et six. Une dizaine de cycles.',d:'2 min',br:1},
+C24:{n:'Dix minutes dehors',a:'C',c:'Sortez et marchez dix minutes dans un endroit qui a un peu de vert. Sans téléphone, sans destination.',d:'10 min'},
+C25:{n:'Le geste avant l’envie',a:'C',c:'Quand l’envie monte, posez la main là où vous la sentez — gorge, poitrine, ventre — et respirez en gardant l’attention à cet endroit. Regardez-la monter, tenir, redescendre.',d:'2 min',ch:1},
+P13:{n:'Se parler par son prénom',a:'P',c:'Reprenez ce qui vous préoccupe, mais en vous adressant à vous-même par votre prénom, à la deuxième personne. Non pas « pourquoi est-ce que je rate tout », mais « qu’est-ce qui se passe pour toi ? ».',d:'1 min',ch:1},
+P14:{n:'Le rendez-vous des soucis',a:'P',c:'Fixez un créneau de quinze minutes, toujours au même moment, réservé à vos soucis. En dehors, notez-les d’un mot et dites-vous : ce n’est pas l’heure.',d:'1 min'},
+P15:{n:'Ce que je dirais à un autre',a:'P',c:'Prenez ce que vous venez de vous reprocher. Dites-vous exactement ce que vous diriez à un ami qui vous raconterait la même chose.',d:'2 min'},
+P16:{n:'La main sur soi',a:'P',c:'Posez une main sur votre poitrine. Nommez ce qui est difficile. Ajoutez : c’est un moment dur, et beaucoup de gens connaissent ça. Puis : de quoi j’aurais besoin, là ?',d:'1 min',ch:1},
+P17:{n:'Agir avant d’en avoir envie',a:'P',c:'Choisissez une action que vous feriez si vous alliez bien, et faites-la maintenant, sans attendre d’en avoir envie. Petite.',d:'2 min'},
+P18:{n:'Choisir sur ce qui compte',a:'P',c:'Avant de décider de votre journée, posez-vous une seule question : qu’est-ce qui compte pour moi ? Puis choisissez une action qui va dans ce sens, quoi que vous ressentiez.',d:'2 min'},
+E13:{n:'Le plan si-alors',a:'E',c:'Écrivez une phrase, une seule : « Si [situation précise], alors je [action précise]. » Par exemple : « Si je pose mes clés en rentrant, alors je fais trois soupirs. »',d:'2 min'},
+E14:{n:'Le si-alors de l’obstacle',a:'E',c:'Repérez ce qui fait le plus souvent échouer votre geste. Écrivez : « Si [l’obstacle survient], alors je [réponse préparée]. »',d:'2 min'},
+E15:{n:'Le si-alors de la tentation',a:'E',c:'Écrivez : « Si [le déclencheur apparaît], alors je [geste de remplacement]. » Par exemple : « Si j’ouvre le placard sans faim, alors je bois un verre d’eau et je change de pièce. »',d:'2 min'},
+E16:{n:'Vingt secondes de plus',a:'E',c:'Ajoutez vingt secondes d’effort à ce qui vous happe : téléphone dans une autre pièce, aliment rangé en hauteur. Puis retirez-en vingt à ce que vous voulez faire.',d:'2 min'},
+E17:{n:'Dire une chose vraie',a:'E',c:'Aujourd’hui, dites une seule chose que vous auriez tue. Petite. Un avis, une préférence, un non sur un sujet mineur. Choisissez-la à l’avance, et choisissez-la facile.',d:'2 min'},
+E18:{n:'Une chose pour quelqu’un',a:'E',c:'Faites une petite chose pour quelqu’un, sans l’annoncer et sans attendre de réponse.',d:'2 min'},
+T01:{n:'Le test d’une heure',a:'P',c:'Ralentissez vraiment pendant une heure aujourd’hui. Avant, écrivez ce que vous craignez qu’il arrive. Après, écrivez ce qui est réellement arrivé.',d:'3 min'},
+T02:{n:'Poser sa tête un soir',a:'P',c:'Ce soir, arrêtez de tourner le sujet. Écrivez d’abord ce que vous craignez de rater en arrêtant. Demain matin, relisez et vérifiez.',d:'3 min'},
+T03:{n:'Deux minutes en présence',a:'P',c:'Approchez ce que vous évitez et restez-y deux minutes, sans rien faire d’autre. Notez de 0 à 10 avant d’entrer, et au moment de sortir.',d:'3 min'},
+T04:{n:'Un besoin dit',a:'P',c:'Formulez un besoin à quelqu’un aujourd’hui. Un seul, petit. Écrivez avant ce que vous craignez, et après ce qui s’est passé.',d:'3 min'},
+T05:{n:'Laisser passer la vague',a:'P',c:'Quand la tristesse monte, ne la coupez pas. Laissez-la monter, culminer, redescendre. Regardez l’heure au début et à la fin.',d:'3 min'},
+T06:{n:'Finir une chose',a:'P',c:'Prenez quelque chose de presque terminé et terminez-le aujourd’hui. Écrivez avant ce que vous craignez que ça change.',d:'3 min'},
+T07:{n:'Laisser le silence',a:'P',c:'Aujourd’hui, ne relancez pas. Ne sur-expliquez pas. Laissez un silence là où vous auriez comblé. Notez ce qui arrive au lien.',d:'3 min'},
+T08:{n:'Le même traitement',a:'P',c:'Prenez ce que vous vous reprochez et traitez-vous exactement comme vous traiteriez un ami. Une seule fois, aujourd’hui. Notez ce que ça vous coûte.',d:'3 min'},
+T09:{n:'Trente secondes avant de répondre',a:'P',c:'Quand quelque chose vous touche, attendez trente secondes avant de répondre. Comptez-les vraiment. Puis notez ce que vous auriez dit, et ce que vous avez dit.',d:'2 min',ch:1},
+T10:{n:'Une préférence à contre-attente',a:'P',c:'Dites une préférence qui ne correspond pas à ce qu’on attend de vous. Petite. Écrivez avant ce que vous craignez, après ce qui est arrivé.',d:'3 min'},
+T11:{n:'Prendre la place',a:'P',c:'Faites une chose qui vous rend visible : parler en premier, vous asseoir au milieu plutôt qu’au bord, poser une question devant les autres.',d:'3 min'},
+T12:{n:'Trente secondes avant',a:'P',c:'Quand l’ordre intérieur arrive — « maintenant » —, attendez trente secondes avant d’y répondre. Regardez simplement ce que devient l’envie.',d:'2 min',ch:1},
+O02:{n:'La respiration carrée',a:'C',c:'Inspirez sur quatre temps, retenez quatre temps, expirez quatre temps, retenez quatre temps. Recommencez.',d:'2 min',br:1},
+O06:{n:'Se secouer les mains',a:'C',c:'Secouez les mains comme si vous vouliez les sécher sans serviette, quinze à vingt secondes. Debout, faites de même avec les pieds. Laissez le mouvement être ample et sans contrôle.',d:'45 sec'},
+O07:{n:'Le scan corporel rapide',a:'C',c:'Yeux fermés si possible. Attention au sommet du crâne, puis descendez : visage, nuque, épaules, poitrine, ventre, bas du dos, hanches, jambes, pieds. Notez sans rien chercher à changer.',d:'2 min'},
+O08:{n:'Le tapotement sternal',a:'C',c:'Deux ou trois doigts au centre du sternum. Tapotez doucement, à rythme régulier, vingt à trente secondes, en respirant lentement. L’intention compte autant que le geste.',d:'45 sec',ch:1},
+O10:{n:'La réification',a:'P',c:'Yeux fermés. Prenez ce qui vous préoccupe et laissez-lui prendre une forme : une couleur, un volume, une texture, un poids, une température. Puis demandez-vous : si je pouvais modifier une seule chose dans cette forme, laquelle ?',d:'3 min'},
+O13:{n:'Est-ce que ça comptera',a:'P',c:'Demandez-vous : est-ce que ça comptera encore dans trois heures ? Dans trois jours ? Dans trois mois ? Non pas pour minimiser, mais pour calibrer.',d:'1 min'},
+O14:{n:'Le système de délai',a:'P',c:'Dès que l’envie d’agir monte, interposez un geste neutre avant de céder ou de résister : passer la langue sur vos dents, déplacer un objet, ranger quelque chose. Ce n’est pas une distraction, c’est un sas.',d:'1 min',ch:1},
+O19:{n:'L’ancrage ressource',a:'C',c:'Yeux fermés. Rappelez un moment où vous vous êtes senti calme, fort, ancré. Laissez les images, les sons, les sensations se préciser. Quand vous y êtes, associez cet état à un geste — joindre le pouce et l’index, toucher votre avant-bras. Refait chaque jour, le geste suffira.',d:'3 min'},
+S02:{n:'La facture cachée',a:'P',c:'Vous savez ce que changer coûterait. Écrivez plutôt ce que ça vous coûte, aujourd’hui, de ne pas changer. Une ligne, précise, sur cette semaine.',d:'2 min'},
+S03:{n:'À quoi ça servait',a:'P',c:'Prenez une réaction d’aujourd’hui qui vous a échappé. Demandez-vous : à quel moment de ma vie est-ce que ça m’a été utile ? Ne cherchez pas à la corriger. Datez-la.',d:'2 min'},
+S04:{n:'Le pacte',a:'E',c:'Beaucoup de nos conduites reposent sur un accord jamais dit : si je fais ceci, alors on me laisse tranquille. Écrivez le vôtre en une phrase. Avec qui, et sur quoi.',d:'3 min'},
+S05:{n:'Le rendre facultatif',a:'E',c:'Prenez la conduite que vous voulez lâcher. Aujourd’hui, faites-la une fois en la choisissant délibérément. Demain, laissez-la une fois de côté. Le but n’est pas de l’enlever : c’est qu’elle redevienne un choix.',d:'2 min'},
+S06:{n:'Un cran',a:'E',c:'Repérez votre niveau habituel sur une chose précise — le temps de travail, le volume de votre voix, la place que vous prenez. Déplacez-le d’un cran, dans un seul contexte, pour une seule occasion.',d:'2 min'},
+S07:{n:'Le retour du thermostat',a:'P',c:'Après avoir fait quelque chose d’inhabituel, observez ce qui pousse à revenir en arrière : la fatigue, la justification, l’envie d’annuler. Nommez-le, sans lui obéir tout de suite.',d:'2 min'},
+S08:{n:'Nommer la manœuvre',a:'P',c:'Quand quelque chose s’est déclenché aujourd’hui, nommez ce que vous avez fait : lutter, fuir, vous figer, vous couper, ruminer, ou pacifier. Nommer suffit.',d:'1 min',ch:1},
+S09:{n:'Ce que ça apportait',a:'P',c:'Nommez une chose que la période d’avant vous apportait et qui n’est plus. Puis une seule chose, minuscule, qui pourrait en apporter un peu aujourd’hui.',d:'3 min'},
+S10:{n:'Le coût du oui',a:'E',c:'Avant d’accepter quelque chose aujourd’hui, comptez jusqu’à trois. Pendant ces trois secondes, demandez-vous ce que ce oui va coûter cette semaine.',d:'1 min'}
+};
+var GB={
+C02:'Une expiration plus longue que l’inspiration soutient le retour au calme.',
+C05:'Un rythme régulier, autour de six respirations par minute, aide à réguler le système nerveux.',
+C12:'Relâcher juste après avoir contracté fait tomber la tension musculaire de fond.',
+C13:'Le geste ample et le souffle fort aident à évacuer une tension accumulée.',
+C14:'La nuque concentre les tensions du stress\u202F; l’étirer apaise les raideurs de posture.',
+C15:'Détendre les muscles du visage envoie au cerveau un signal de sécurité.',
+C16:'La chaleur et l’obscurité reposent des yeux sollicités par les écrans.',
+C17:'Cette position relâche le bas du dos et le diaphragme, souvent contractés sous tension.',
+C18:'Ramener l’attention aux cinq sens coupe l’emballement mental et ancre dans le présent.',
+C19:'Le bercement lent, de gauche à droite, aide à se réconforter soi-même.',
+C20:'Sentir ses appuis recentre quand on se sent emporté.',
+C21:'Sentir le soutien du siège et du sol apaise l’impression d’être «\u202Fen l’air\u202F».',
+H01:'Greffer un geste de calme sur un moment qui existe déjà évite d’avoir à y penser.',
+P01:'Le préfixe crée une distance\u202F: vous avez une pensée, vous n’êtes pas la pensée.',
+P02:'Regarder les pensées passer plutôt que les suivre desserre la rumination.',
+P03:'L’image rappelle que les pensées vont et viennent, qu’elles ne sont pas figées.',
+P04:'Répété assez longtemps, un mot dur se vide de son sens et n’est plus qu’un son.',
+P05:'Le geste montre qu’on peut garder une pensée sans la laisser tout recouvrir.',
+P06:'Décharger par écrit, sans se relire, allège sans rouvrir le sujet.',
+P07:'Choisir une seule priorité dissout le sentiment d’urgence diffuse.',
+P08:'La question ramène les fausses urgences au réel et les dégonfle.',
+P09:'Porter toute son attention à un geste simple coupe le pilote automatique.',
+P10:'Orienter l’attention vers ce qui tient, sans nier ce qui pèse.',
+P11:'Ralentir volontairement un geste désactive le mode urgence.',
+P12:'Relâche la pression interne qui entretient le sur-régime.',
+E01:'Un indice visible déclenche le geste mieux que la volonté ne le ferait.',
+E02:'Greffer le geste sur une habitude existante lui donne un déclencheur fiable.',
+E03:'Un déclencheur récurrent automatise la pause, sans effort de mémoire.',
+E04:'Baisser l’effort d’entrée augmente nettement la chance de faire le geste.',
+E05:'Ajouter une friction à une distraction suffit souvent à l’espacer.',
+E08:'Un lieu où l’on se sent bien accélère la récupération.',
+E09:'L’environnement agit directement sur l’état intérieur.',
+E10:'Soixante secondes de récupération entre deux activités amorcent un vrai reset.',
+E11:'Un rituel signale au cerveau que le temps de travail est clos, et protège le repos.',
+E12:'Moins de lumière et d’activation le soir facilite l’endormissement.',
+C22:'La double inspiration rouvre les alvéoles restées fermées\u202F; l’expiration longue décharge la tension. C’est la forme la plus étudiée des exercices respiratoires courts.',
+C23:'Une expiration deux fois plus longue que l’inspiration est le rapport le plus souvent retenu dans les travaux sur la respiration lente.',
+C24:'Le contact avec un espace vert fait baisser la fatigue et remonter la vitalité, et l’effet est net dès les premières minutes.',
+C25:'L’envie ne s’éteint pas plus vite. Ce qui change, c’est ce que vous faites pendant qu’elle est là.',
+P13:'Changer de pronom crée une distance, et cette distance ne demande aucun effort de contrôle.',
+P14:'Vous ne renoncez à rien\u202F: vous déplacez. Ce qui se réduit, c’est le temps que le souci occupe dans la journée.',
+P15:'Les personnes dures avec elles-mêmes sont rarement dures avec les autres. Il s’agit d’appliquer à soi la règle qu’on applique déjà.',
+P16:'Trois mouvements dans cet ordre\u202F: reconnaître, ne pas se croire seul, s’adresser un mot utile.',
+P17:'L’envie ne revient pas avant l’action. Elle revient après, et souvent seulement après plusieurs fois.',
+P18:'Décider d’après l’humeur enferme quand l’humeur est basse. Décider d’après ce qui compte laisse une porte ouverte les mauvais jours.',
+E13:'Ce n’est pas une résolution, c’est un déclencheur\u202F: la situation fait le travail à la place de la volonté.',
+E14:'Prévoir la panne à l’avance évite d’avoir à décider au pire moment.',
+E15:'Le déclencheur est repéré d’avance, donc la réponse part sans délibération — et c’est dans la délibération qu’on perd.',
+E16:'Vous ne modifiez pas votre volonté. Vous modifiez la distance.',
+E17:'Ce qui s’entraîne, ce n’est pas le courage\u202F: c’est la découverte que la conséquence redoutée n’arrive pas.',
+E18:'Se tourner vers l’extérieur interrompt la boucle sur soi mieux que d’essayer de ne pas y penser.',
+T01:'Ce que coûte ralentir une heure\u202F: presque rien. Le système ne s’effondre pas. Mais tant qu’on ne l’a pas vérifié, on n’en a pas la preuve.',
+T02:'La problématique sera encore là demain. La rumination ne l’a jamais résolue.',
+T03:'Une montée, puis une descente. Rester coûte moins cher que d’éviter.',
+T04:'Dans la grande majorité des cas, dire un besoin coûte bien moins que le silence chronique.',
+T05:'Quelques minutes difficiles, puis une légèreté inattendue. Les émotions montent, culminent et finissent par redescendre.',
+T06:'L’environnement réagit, mais rarement comme imaginé. Le coût de la réussite est presque toujours surestimé.',
+T07:'Le lien réel tient sans ces dépenses. Le lien fragile était déjà fragile.',
+T08:'Ce que ça coûte\u202F: rien. Et ce rien semble hors de prix. Il semble usurpé.',
+T09:'Une légère tension, et puis souvent, une clarté. L’explosion libère moins qu’elle ne semble le promettre.',
+T10:'Dire une préférence simple coûte beaucoup moins que de la garder pour soi.',
+T11:'Très rarement ce qui avait été imaginé. Et chaque fois que le coût réel est plus bas, le seuil se déplace.',
+T12:'L’envie monte, culmine, puis redescend. Toujours. Pas parce qu’on est fort — parce que c’est sa nature.',
+O02:'Le rythme régulier et les temps de rétention ralentissent l’ensemble et occupent l’attention.',
+O06:'Le mouvement ample décharge la tension neuromusculaire qui reste après une activation.',
+O07:'Repérer où c’est tendu, sans rien corriger, suffit souvent à faire baisser d’un cran.',
+O08:'Un geste d’auto-contact, au centre de la poitrine\u202F: une façon de vous signifier que vous prenez soin de vous.',
+O10:'Donner une forme à ce qui est flou le rend maniable. Ça ne supprime pas l’émotion, ça permet d’agir dessus.',
+O13:'La question ne minimise pas\u202F: elle calibre. Si la réponse est non, vous avez l’autorisation de lâcher un peu.',
+O14:'Un micro-écart entre l’envie et l’action laisse passer le pic. Il vous redonne une seconde de choix.',
+O19:'Répété, le geste finit par rappeler l’état à lui seul.',
+S02:'On voit toujours le prix du changement, jamais celui de l’immobilité. Il est pourtant payé chaque semaine.',
+S03:'Une conduite qui vous échappe a presque toujours servi à quelque chose, un jour. La dater la rend moins absurde, et moins honteuse.',
+S04:'Un accord jamais formulé ne peut pas être renégocié. L’écrire est la seule façon de le rouvrir.',
+S05:'Entre subir une conduite et l’avoir supprimée, il y a un état intermédiaire\u202F: pouvoir la choisir.',
+S06:'Votre seuil se déplace par petits écarts répétés, pas par un saut. Un cran suffit.',
+S07:'Ce qui vous ramène en arrière n’est pas un manque de volonté\u202F: c’est un rappel de niveau. Le reconnaître le rend moins impérieux.',
+S08:'Nommer la manœuvre suffit à ne plus être entièrement dedans.',
+S09:'Le manque garde sa place. On lui met simplement quelque chose à côté.',
+S10:'Trois secondes suffisent à transformer un réflexe en décision.'
+};
+var IND={
+sur:{lb:'Sur-régime',sl:'Seuil de stress',sym:1,
+  C:['C22','C05','C12','C14','C24','O06'],
+  P:['P12','T01','P11','S07','S02','O13'],
+  E:['E13','E10','E11','S05','S06','E14']},
+rum:{lb:'Rumination',sl:'Seuil d’incertitude',sym:0,
+  C:['C22','C02','C18','C16','H01','O02'],
+  P:['P14','T02','P01','P02','O13','P06','P13','O10'],
+  E:['E13','E12','E03','E10','E14']},
+bloc:{lb:'Évitement',sl:'Seuil de tolérance à l’inconfort',sym:0,
+  C:['C22','C13','O19','O06'],
+  P:['T03','P07','P08','S02','P17','O10'],
+  E:['E13','E04','E02','E05','E16','E14']},
+vide:{lb:'Sous-régime',sl:'Seuil d’activation',sym:0,
+  C:['C13','C17','C20','C24','O06'],
+  P:['P17','T04','P18','P10','P09','S02'],
+  E:['E13','E08','E04','E02','E18','S06']},
+deuil:{lb:'Deuil bloqué',sl:'Seuil d’acceptation',sym:0,
+  C:['C02','C16','C19','C24','O08'],
+  P:['S09','T05','P10','P03','P13','P16','O10'],
+  E:['E13','E08','E09','E18']},
+sabotage:{lb:'Auto-sabotage',sl:'Seuil de réussite',sym:1,
+  C:['C05','O19','C12','O07'],
+  P:['S07','T06','P10','P01','P18','O10'],
+  E:['E13','E03','E11','E09','S05']},
+insec:{lb:'Insécurité relationnelle',sl:'Seuil d’inclusion',sym:0,
+  C:['C19','O08','C18','C23'],
+  P:['P13','T07','S03','P02','P15','P16'],
+  E:['E13','E03','E17','E18','S04']},
+autocrit:{lb:'Autocritique',sl:'Seuil de dignité',sym:1,
+  C:['O08','C15','C02','O07'],
+  P:['P13','T08','P15','P16','P04','P05','P10','S03'],
+  E:['E13','E09','E03','E18']},
+impuls:{lb:'Impulsivité',sl:'Seuil de tolérance à la frustration',sym:0,
+  C:['C22','C18','C20','O06','H01'],
+  P:['O14','T09','S08','P11','P13','S03'],
+  E:['E13','E05','E03','E15','E16']},
+hyper:{lb:'Hyperadaptation',sl:'Seuil de conformité',sym:1,
+  C:['C21','C02','C24','O07'],
+  P:['S03','T10','P10','P12','P18','S02'],
+  E:['S10','E13','S04','E10','E17','S05','E11']},
+inhib:{lb:'Inhibition',sl:'Seuil d’expression',sym:0,
+  C:['C13','O19','C20','C23'],
+  P:['T11','P12','P10','S03','S07','O13'],
+  E:['E17','E13','E04','S04','S06','E14']},
+compuls:{lb:'Compulsions alimentaires',sl:'Seuil d’apaisement',sym:0,
+  C:['C25','C18','C22','O08'],
+  P:['O14','T12','P11','P15','S08','O10'],
+  E:['E15','E13','E05','E01','E10','E16','S05']}
+};
+
+/* QUESTIONNAIRE (v36) — 36 items, 3 par indication, tous dans le même sens.
+   s:1 = item de dépistage, posé à tout le monde au premier tour.
+   Les deux autres ne sont posés que si l'indication ressort. */
+var QITEMS=[
+ {t:'Même quand je ne fais rien, mon corps reste tendu.',k:'sur',s:1},
+ {t:'Je passe d’une chose à l’autre sans m’arrêter entre les deux.',k:'sur'},
+ {t:'Le repos me met mal à l’aise, comme si je perdais du temps.',k:'sur'},
+
+ {t:'Le soir venu, je rejoue des scènes en cherchant ce que j’aurais dû dire.',k:'rum',s:1},
+ {t:'Une remarque entendue plus tôt continue de me trotter dans la tête.',k:'rum'},
+ {t:'Avant d’agir, je retourne longtemps la situation dans tous les sens.',k:'rum'},
+
+ {t:'Une tâche simple peut traîner des jours sans que je m’y mette.',k:'bloc',s:1},
+ {t:'Je m’occupe de mille petites choses pour ne pas commencer celle qui compte.',k:'bloc'},
+ {t:'Plus je repousse quelque chose, plus il me devient difficile de m’y mettre.',k:'bloc'},
+
+ {t:'Des gestes ordinaires me demandent un effort que je ne m’explique pas.',k:'vide',s:1},
+ {t:'Je remets au lendemain par manque d’élan, pas par manque de temps.',k:'vide'},
+ {t:'Peu de choses me donnent vraiment envie en ce moment.',k:'vide'},
+
+ {t:'Quand quelque chose rate, je me parle comme je ne parlerais à personne.',k:'autocrit',s:1},
+ {t:'Une réussite me paraît normale ; une erreur, je me la reproche longtemps.',k:'autocrit'},
+ {t:'J’ai le sentiment de ne pas être à la hauteur.',k:'autocrit'},
+
+ {t:'Je devine ce que l’on attend de moi et je m’y ajuste sans y penser.',k:'hyper',s:1},
+ {t:'À force de m’adapter aux autres, je perds le fil de ce que je veux.',k:'hyper'},
+ {t:'Dire non me coûte, alors j’accepte ce que je ne veux pas.',k:'hyper'},
+
+ {t:'Je compare le présent à une période qui n’est plus.',k:'deuil',s:1},
+ {t:'Quelque chose en moi n’a pas vraiment accepté ce qui a changé.',k:'deuil'},
+ {t:'Aller mieux me donnerait l’impression de trahir quelque chose.',k:'deuil'},
+
+ {t:'Quand les choses commencent à bien aller, quelque chose en moi freine.',k:'sabotage',s:1},
+ {t:'Quand quelque chose me réussit, je finis par le gâcher.',k:'sabotage'},
+ {t:'Je préfère laisser les choses inachevées plutôt que de les voir jugées.',k:'sabotage'},
+
+ {t:'Une réponse qui tarde, et j’imagine que l’on s’éloigne de moi.',k:'insec',s:1},
+ {t:'Je guette les signes que je compte moins qu’avant pour quelqu’un.',k:'insec'},
+ {t:'J’ai l’impression que les gens me supportent plus qu’ils ne m’apprécient.',k:'insec'},
+
+ {t:'Des mots ou des gestes m’échappent avant que je puisse les retenir.',k:'impuls',s:1},
+ {t:'Sous le coup de l’émotion, j’agis, et je réfléchis ensuite.',k:'impuls'},
+ {t:'Quand je me sens attaqué, je réponds avant d’avoir décidé de répondre.',k:'impuls'},
+
+ {t:'J’ai un avis, mais je le garde pour moi de peur de gêner.',k:'inhib',s:1},
+ {t:'Devant l’occasion de me lancer, je me fige et je laisse passer.',k:'inhib'},
+ {t:'Prendre de la place devant les autres me met mal à l’aise.',k:'inhib'},
+
+ {t:'Manger m’apaise quand une tension monte, même sans faim.',k:'compuls',s:1},
+ {t:'Quand l’émotion monte, je cherche quelque chose à grignoter.',k:'compuls'},
+ {t:'Une fois que j’ai commencé, autant continuer jusqu’au bout.',k:'compuls'}
+];
+var QOPTS=['Pas du tout','Un peu','Plutôt','Tout à fait'];
+var PHASES=['Observer','Agir','Approfondir','Consolider'];
+
+/* Seuils de semaine — le moment ludique et le moment de sens.
+   Un seul mentionne le livre (fin de semaine 2). */
+var SEUILS={
+ 1:{t:'Vous avez observé',c:'Sept jours à regarder ce qui se passe, sans rien forcer. C’est la partie que tout le monde saute — et c’est celle qui fait tenir la suite. Vous entrez dans la phase Agir : les mêmes gestes, un peu plus assumés.'},
+ 2:{t:'La moitié',c:'Quatorze jours. À ce stade, la plupart des gens remarquent quelque chose de curieux : ce n’est pas qu’ils ont plus de volonté, c’est que le geste demande moins de décision. C’est exactement le point que décrit <i>Comprendre ne suffit pas</i>, le livre dont cette application est tirée.',lien:1},
+ 3:{t:'Ça tient tout seul',c:'Vingt et un jours. Vous entrez dans Consolider. Il ne s’agit plus d’apprendre des gestes, mais de vérifier lesquels restent quand vous n’y pensez plus. Gardez ceux-là.'}
+};
+
+function $(id){return document.getElementById(id)}
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function week(d){return Math.ceil((d||S.day)/7)}
+function phase(d){return PHASES[week(d)-1]}
+function anchorC(list){for(var i=0;i<list.length;i++){if(G[list[i]].br)return list[i];}return list[0];}
+function rot(list,w){return list[(w-1)%list.length];}
+/* ROTATION (v34)
+   - Le 1er geste de chaque liste est le geste-ancre du parcours : il revient un
+     jour sur deux, parce que c'est la répétition qui installe.
+   - Les autres tournent CHAQUE JOUR (et non plus chaque semaine).
+   - Les gestes aimés (coeur) passent en tête de la rotation.
+   - Un geste écarté (croix) sort à partir du lendemain. */
+function ecarte(code,d){var j=S.fbd[code];return !!(j&&d>j);}
+function pool(list,d){var ok=list.filter(function(c){return !ecarte(c,d);});return ok.length?ok:list;}
+function prio(list){
+  var aimes=[],autres=[];
+  list.forEach(function(c){ (S.fb[c]===1?aimes:autres).push(c); });
+  return aimes.concat(autres);
+}
+function slot(list,d,off){
+  var pl=pool(list,d);
+  if(pl.length<2)return pl[0];
+  var anc=pl[0],rest=prio(pl.slice(1));
+  if(off===0&&d%2===1)return anc;          // l'ancre un jour sur deux
+  var k=Math.floor((d-1+off*3)/(off===0?2:1));
+  return rest[((k%rest.length)+rest.length)%rest.length];
+}
+function todayGestes(d){
+  d=d||S.day;
+  var ind=IND[S.parcours],out=[];
+  function add(c){if(c&&out.indexOf(c)<0)out.push(c);}
+  var Cl=pool(ind.C,d);
+  add(Cl[0]);                               // ancre Corps : tous les jours
+  if(S.deg===1)return out;
+  add(slot(ind.P,d,0));
+  add(slot(ind.E,d,0));
+  if(S.deg>=4)add(slot(ind.C,d,1));
+  if(S.deg>=6){add(slot(ind.P,d,1));add(slot(ind.E,d,1));}
+  return out;
+}
+var AXC={C:'var(--C)',P:'var(--P)',E:'var(--E)'},AXN={C:'Corps',P:'Pensées',E:'Environnement'};
+
+/* ---------- Contexte navigateur / installation ---------- */
+var UA=navigator.userAgent||'';
+var IN_APP=/FBAN|FBAV|FB_IAB|Instagram|LinkedInApp|Line\/|Twitter|Snapchat|Pinterest/i.test(UA);
+var IS_IOS=/iPad|iPhone|iPod/.test(UA)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+var STANDALONE=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true;
+var deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;var b=$('installBtn');if(b)b.style.display='block';});
+
+function mark(){return '<svg class="mk" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="8.5" fill="#2A2E42"/>'+
+  '<path d="M30 62 A22 22 0 1 1 70 62" fill="none" stroke="#C4973A" stroke-width="2.4" stroke-linecap="round"/>'+
+  '<path d="M22 68 A32 32 0 1 1 78 68" fill="none" stroke="#967637" stroke-width="1.7" stroke-linecap="round"/>'+
+  '<path d="M14 74 A42 42 0 1 1 86 74" fill="none" stroke="#685734" stroke-width="1.1" stroke-linecap="round" opacity=".75"/></svg>';}
+
+function render(){
+  var s=$('scr');
+  if(S.scr==='w')return rW(s);
+  if(S.scr==='aide')return rAide(s);
+  if(S.scr==='quiz')return rQuiz(s);
+  if(S.scr==='pick')return rPick(s);
+  if(S.scr==='pick2')return rPick(s,1);
+  if(S.scr==='compare')return rCompare(s);
+  if(S.scr==='result')return rResult(s);
+  if(S.scr==='rien')return rRien(s);
+  if(S.scr==='deg')return rDeg(s);
+  if(S.scr==='mode')return rMode(s);
+  if(S.scr==='fin')return rFin(s);
+  if(S.scr==='trac')return rTrac(s);
+  if(S.scr==='home'){nav();if(S.tab==='j')return rJ(s);if(S.tab==='p')return rParcours(s);if(S.tab==='t')return rTrac(s);if(S.tab==='r')return rReglages(s);}
+}
+function go(x){S.scr=x;window.scrollTo(0,0);render();}
+function vd(){return S.vday||S.day;}
+function viewDay(n){if(n<1)n=1;if(n>=S.day){S.vday=null;}else{S.vday=n;}S.tab='j';S.scr='home';window.scrollTo(0,0);render();}
+function backToday(){S.vday=null;window.scrollTo(0,0);render();}
+
+/* ---------- Accueil ---------- */
+function rW(s){$('nav').innerHTML='';
+  var inapp=IN_APP?'<div class="warn"><b>Vous êtes dans le navigateur de '+(/LinkedIn/i.test(UA)?'LinkedIn':/Instagram/i.test(UA)?'Instagram':'Facebook')+'.</b><br>Il efface les données en se fermant, et ne sait pas installer l’application. Touchez les trois points en haut à droite, puis «\u202FOuvrir dans le navigateur\u202F».</div>':'';
+  s.innerHTML='<div class="pad fi"><div style="height:22px"></div>'+mark()+
+  '<h1 style="font-size:36px;line-height:1.02;margin-bottom:14px;text-align:center">Micro-gestes</h1>'+
+  '<p class="muted" style="text-align:center;margin:0 0 22px">Vingt-huit jours, quelques gestes par jour. Pas de volonté à fournir : un rendez-vous court avec vous-même.</p>'+
+  inapp+
+  '<div class="card" style="margin-bottom:14px"><p style="font-size:13.5px;color:#5f5a4d;line-height:1.75;margin:0">'+
+  'Comprendre ce qui coince ne suffit pas à le changer. Ce qui change quelque chose, c’est un geste assez petit pour être fait un jour où vous n’avez envie de rien.<br><br>'+
+  'Vous répondez à une douzaine d’affirmations, puis à quelques-unes de plus sur ce qui vous concerne. L’application vous propose alors un point de départ. Ensuite, chaque jour, deux ou trois gestes courts sur le corps, les pensées, l’environnement. Aucun score, aucune série à ne pas casser.</p></div>'+
+  '<div class="note" style="margin-bottom:22px">Gratuit, sans compte, sans publicité. Ce que vous notez reste sur cet appareil : rien n’est envoyé nulle part.</div>'+
+  '<button class="btn bp" onclick="startQuiz()">Commencer</button>'+
+  '<button class="btn bs" id="installBtn" style="display:none" onclick="doInstall()">Installer sur mon téléphone</button>'+
+  (IS_IOS&&!STANDALONE&&!IN_APP?'<button class="btn bs" onclick="iosHelp()">Installer sur mon téléphone</button>':'')+
+  '<div class="sep"></div>'+
+  '<p class="sig" style="text-align:center">Une application de <b>Yann Riguidel</b>, praticien en hypnose à '+CFG.ville+',<br>d’après son livre <a class="lk" href="'+CFG.livre+'" target="_blank" rel="noopener"><i>Comprendre ne suffit pas</i></a>.<br>'+
+  '<a class="lk" href="'+CFG.site+'" target="_blank" rel="noopener">yannriguidelhypnose.fr</a></p>'+
+  '<p style="text-align:center;margin-top:18px"><a class="lk" onclick="go(\'aide\')" style="font-size:12.5px;text-decoration:underline">Reprendre un parcours ou choisir sans le test</a></p></div>';
+}
+function doInstall(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null;var b=$('installBtn');if(b)b.style.display='none';}}
+function iosHelp(){
+  sheet('ovI','Installer','Micro-gestes sur votre écran d’accueil',
+  '<div class="note" style="margin-bottom:12px">1. Touchez le bouton <b>Partager</b> en bas de Safari (le carré avec une flèche).<br>2. Faites défiler et choisissez <b>Sur l’écran d’accueil</b>.<br>3. Validez.</div>'+
+  '<p class="muted" style="font-size:13px">L’application fonctionnera ensuite sans connexion, comme une application normale.</p>');
+}
+
+/* ---------- Aide / reprise ---------- */
+function rAide(s){$('nav').innerHTML='';
+  s.innerHTML='<div class="pad fi"><div style="height:24px"></div>'+
+  '<h2 style="font-size:23px;margin-bottom:16px">Reprendre ou choisir</h2>'+
+  '<div class="card"><p style="font-size:13.5px;color:#5f5a4d;margin:0 0 10px;line-height:1.6">Vous savez déjà ce sur quoi vous voulez travailler ? Choisissez directement votre parcours, sans passer par les questions.</p>'+
+  '<button class="mini" onclick="go(\'pick\')">Voir les douze parcours</button></div>'+
+  '<div class="card"><p style="font-size:13.5px;color:#5f5a4d;margin:0 0 10px;line-height:1.6">Vous aviez commencé sur un autre appareil, ou vos données ont été effacées ? Collez le code de reprise que vous aviez gardé.</p>'+
+  '<textarea id="codeIn" rows="3" placeholder="Votre code…"></textarea>'+
+  '<button class="mini" style="margin-top:8px" onclick="doRestore()">Restaurer mon parcours</button></div>'+
+  '<button class="btn bs" style="margin-top:10px" onclick="go(\'w\')">Retour</button></div>';
+}
+function stateCore(){return {persoL:S.persoL,parcours:S.parcours,deg:S.deg,mode:S.mode,day:S.day,done:S.done,memos:S.memos,fb:S.fb,fbd:S.fbd,releve:S.releve,remind:S.remind,seuils:S.seuils,fin:S.fin,cycle:S.cycle,arch:S.arch,qhist:S.qhist};}
+function makeCode(){try{return btoa(unescape(encodeURIComponent(JSON.stringify(stateCore()))));}catch(e){return '';}}
+function restoreCode(str){
+  try{
+    str=(str||'').trim();if(!str)return false;
+    var d=JSON.parse(decodeURIComponent(escape(atob(str))));
+    if(d&&d.persoL&&d.persoL.C){IND.perso={lb:'Votre sélection',sl:'Vos gestes retenus',sym:0,C:d.persoL.C,P:d.persoL.P,E:d.persoL.E};}
+    if(!d||!d.parcours||!IND[d.parcours])return false;
+    S.parcours=d.parcours;S.deg=d.deg||3;S.mode=d.mode||'rdv';S.day=d.day||1;
+    S.done=Array.isArray(d.done)?d.done:[];S.memos=d.memos||{};S.fb=d.fb||{};S.remind=d.remind||'08:00';
+    S.seuils=Array.isArray(d.seuils)?d.seuils:[];S.fin=d.fin||0;
+    S.fbd=d.fbd||{};S.releve=d.releve||{};S.cycle=d.cycle||1;S.arch=Array.isArray(d.arch)?d.arch:[];
+    if(Array.isArray(d.qhist))S.qhist=d.qhist;
+    if(d.persoL&&d.persoL.C)S.persoL=d.persoL;
+    S.scr='home';S.tab='j';sv();return true;
+  }catch(e){return false;}
+}
+function doRestore(){var el=$('codeIn');if(restoreCode(el?el.value:'')){render();toast('Parcours restauré.');}else{toast('Ce code n’est pas reconnu.');}}
+function copyCode(){var c=makeCode(),t=$('codeOut');if(t){t.value=c;t.focus();t.select();}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(c).then(function(){toast('Code copié.');},function(){toast('Code affiché — copiez-le.');});}
+  else toast('Code affiché — copiez-le.');}
+
+/* ---------- Questionnaire ---------- */
+/* QUESTIONNAIRE ADAPTATIF (v36)
+   Tour 1 : les 12 items de dépistage, un par indication.
+   Tour 2 : seules les 3 indications qui ressortent sont approfondies (2 items
+   chacune). 18 questions au lieu de 30, et de la précision là où elle compte.
+
+   Le score est IPSATIF : on retranche à chaque indication la moyenne de la
+   personne. Quelqu'un qui approuve tout, ou qui n'approuve rien, n'est plus
+   orienté au hasard — c'est son relief qui décide, pas son niveau général. */
+function screeners(){var o=[];for(var i=0;i<QITEMS.length;i++)if(QITEMS[i].s)o.push(i);return o;}
+function itemsDe(k){var o=[];for(var i=0;i<QITEMS.length;i++)if(QITEMS[i].k===k&&!QITEMS[i].s)o.push(i);return o;}
+function melange(a){for(var j=a.length-1;j>0;j--){var r=Math.floor(Math.random()*(j+1)),t=a[j];a[j]=a[r];a[r]=t;}return a;}
+
+function startQuiz(again){
+  S.qorder=melange(screeners());
+  S.qi=0;S.ans=[];S.tour=1;S.again=again?1:0;S.sc1=null;S.finalistes=null;
+  go('quiz');
+}
+function qitem(i){return QITEMS[S.qorder[i]];}
+
+/* scores du tour 1 : une valeur brute par indication (0-3) */
+function scoresTour1(){
+  var o={};
+  for(var i=0;i<S.qorder.length;i++){var it=QITEMS[S.qorder[i]];
+    if(it.s)o[it.k]=(typeof S.ans[i]==='number')?S.ans[i]:0;}
+  Object.keys(IND).forEach(function(k){if(o[k]==null)o[k]=0;});
+  return o;
+}
+function moyenne(o){var s=0,n=0;for(var k in o){s+=o[k];n++;}return n?s/n:0;}
+
+/* score final d'une indication : moyenne de ses items posés, moins la moyenne
+   générale de la personne (ipsatif) */
+function scoreFinal(){
+  var sc1=S.sc1||scoresTour1(),m=moyenne(sc1),out={};
+  Object.keys(IND).forEach(function(k){out[k]=sc1[k]-m;});
+  if(S.finalistes){
+    S.finalistes.forEach(function(k){
+      var som=sc1[k],n=1;
+      for(var i=0;i<S.qorder.length;i++){var it=QITEMS[S.qorder[i]];
+        if(!it.s&&it.k===k&&typeof S.ans[i]==='number'){som+=S.ans[i];n++;}}
+      out[k]=(som/n)-m;
+    });
+  }
+  return out;
+}
+function classe(sc){
+  return Object.keys(IND).sort(function(a,b){return sc[b]-sc[a];});
+}
+
+function qa(v){
+  if(!S.ans)S.ans=[];
+  S.ans[S.qi]=v;S.qi++;
+  if(S.qi<S.qorder.length){render();return;}
+
+  if(S.tour===1){
+    S.sc1=scoresTour1();
+    var brut=S.sc1,max=0;for(var k in brut)if(brut[k]>max)max=brut[k];
+    if(max<1){                                   // rien ne ressort vraiment
+      S.suggest=null;memoQuiz();go('rien');return;
+    }
+    var ord=Object.keys(IND).sort(function(a,b){return brut[b]-brut[a];});
+    S.finalistes=ord.slice(0,3);
+    var suite=[];
+    S.finalistes.forEach(function(k){suite=suite.concat(itemsDe(k));});
+    S.qorder=S.qorder.concat(melange(suite));
+    S.tour=2;render();return;
+  }
+
+  var sc=scoreFinal(),ord=classe(sc);
+  S.suggest=ord[0];S.second=ord[1];
+  S.exaequo=(sc[ord[0]]-sc[ord[1]])<0.34;        // moins d'un tiers de point d'écart
+  memoQuiz(sc);
+  go(S.again?'compare':'result');
+}
+function memoQuiz(sc){
+  if(!S.qhist)S.qhist=[];
+  S.qhist.push({t:Date.now(),scores:S.sc1||scoresTour1(),suggest:S.suggest,cycle:S.cycle});
+  sv();
+}
+
+function rQuiz(s){$('nav').innerHTML='';
+  var n=S.qorder.length,it=qitem(S.qi);
+  var cur=(S.ans&&typeof S.ans[S.qi]==='number')?S.ans[S.qi]:-1;
+  var pct=Math.round(S.qi/n*100);
+  var back=S.qi>0?'<button class="btn bs" style="font-size:13px;padding:11px;margin-top:6px" onclick="S.qi--;render()">Question précédente</button>':'';
+  var tete=(S.tour===2&&S.qi===12)
+    ? '<div class="note" style="margin-bottom:16px">Trois pistes ressortent de vos réponses. Encore six questions, uniquement sur celles-là, pour choisir la bonne.</div>' : '';
+  s.innerHTML='<div class="pad fi"><div style="height:5px;background:var(--surf);border-radius:5px;margin-bottom:22px"><div style="width:'+pct+'%;height:5px;background:var(--gold);border-radius:5px;transition:.3s"></div></div>'+
+  tete+
+  '<p class="lbl" style="margin-bottom:16px">Question '+(S.qi+1)+' / '+n+'</p>'+
+  '<h2 style="font-size:21px;line-height:1.35;margin-bottom:10px">'+it.t+'</h2>'+
+  '<p class="muted" style="margin:0 0 20px;font-size:13px">Répondez sans réfléchir longtemps.</p>'+
+  QOPTS.map(function(o,i){return '<button class="opt'+(cur===i?' sel':'')+'" onclick="qa('+i+')">'+o+'</button>';}).join('')+
+  back+'</div>';
+}
+
+/* aucune indication ne ressort */
+function rRien(s){$('nav').innerHTML='';
+  s.innerHTML='<div class="pad fi"><div style="height:24px"></div>'+
+  '<h2 style="font-size:23px;margin-bottom:12px">Rien ne ressort vraiment</h2>'+
+  '<p style="font-size:14px;color:#4d4940;line-height:1.7;margin:0 0 16px">Vos réponses ne font ressortir aucune difficulté marquée. C’est une bonne nouvelle, et ça veut dire que l’application ne peut pas choisir pour vous.</p>'+
+  '<p style="font-size:14px;color:#4d4940;line-height:1.7;margin:0 0 20px">Vous pouvez quand même faire un parcours — les gestes sont utiles même sans problème identifié. Choisissez celui qui vous parle, ou repassez le questionnaire un jour où ça va moins bien.</p>'+
+  '<button class="btn bp" onclick="go(\'pick\')">Choisir un parcours</button>'+
+  '<button class="btn bs" onclick="go(\'w\')">Revenir à l’accueil</button></div>';
+}
+
+function rPick(s,nouveau){$('nav').innerHTML='';
+  var f=nouveau?'nouveauCycle':'setParcours';
+  var sug=(!nouveau&&S.suggest&&IND[S.suggest])?S.suggest:null;
+  var chapo=nouveau?'Vous repartez pour vingt-huit jours. Vos notes précédentes sont conservées.'
+    :(sug?'Les douze parcours. Celui que vos réponses désignent est signalé — vous n’êtes pas tenu de le suivre.'
+        :'Vous pourrez en changer à tout moment sans rien perdre.');
+  s.innerHTML='<div class="pad fi"><h2 style="font-size:21px;margin-bottom:6px">Lequel vous parle le plus ?</h2>'+
+  '<p class="muted" style="margin-bottom:18px">'+chapo+'</p>'+
+  Object.keys(IND).map(function(k){
+    var m=(k===sug)?'<span style="display:block;font-size:12px;color:var(--gold);margin-top:3px">Proposé par le questionnaire</span>':'';
+    return '<button class="opt'+(k===sug?' sel':'')+'" onclick="'+f+'(\''+k+'\')"><b>'+IND[k].lb+'</b><span>'+IND[k].sl+'</span>'+m+'</button>';}).join('')+
+  (sug?'<button class="btn bs" style="margin-top:8px" onclick="go(\'result\')">Revenir à la proposition</button>':'')+
+  '</div>';
+}
+function rResult(s){$('nav').innerHTML='';var k=S.suggest;
+  if(!k||!IND[k])return rPick(s);
+  if(S.exaequo&&S.second&&IND[S.second]){
+    s.innerHTML='<div class="pad fi"><div style="height:24px"></div>'+
+    '<p class="muted" style="margin-bottom:8px">Deux pistes ressortent presque à égalité. À vous de trancher — vous vous connaissez mieux qu’un questionnaire.</p>'+
+    '<button class="opt" style="margin-top:14px" onclick="setParcours(\''+k+'\')"><b>'+IND[k].lb+'</b><span>'+IND[k].sl+'</span></button>'+
+    '<button class="opt" onclick="setParcours(\''+S.second+'\')"><b>'+IND[S.second].lb+'</b><span>'+IND[S.second].sl+'</span></button>'+
+    '<p class="muted" style="font-size:13px;margin:14px 0 0">Vous pourrez changer à tout moment sans rien perdre.</p>'+
+    '<button class="btn bs" style="margin-top:14px" onclick="go(\'pick\')">Choisir moi-même un autre parcours</button></div>';
+    return;
+  }
+  s.innerHTML='<div class="pad fi"><div style="height:24px"></div>'+
+  '<p class="muted" style="margin-bottom:6px">D’après vos réponses, le parcours qui vous irait le mieux :</p>'+
+  '<h1 style="font-size:31px;line-height:1.1;margin-bottom:8px">'+IND[k].lb+'</h1>'+
+  '<p class="muted" style="margin-bottom:10px">Ce que vous travaillerez : votre '+IND[k].sl.toLowerCase()+'.</p>'+
+  ((S.second&&IND[S.second])?'<p class="muted" style="font-size:13px;margin:0 0 18px">Vient ensuite : '+IND[S.second].lb.toLowerCase()+'.</p>':'<div style="height:8px"></div>')+
+  '<button class="btn bp" onclick="setParcours(\''+k+'\')">Commencer ce parcours</button>'+
+  '<div class="note" style="margin:14px 0 12px">Cette proposition n’a rien d’une ordonnance. Le questionnaire vous connaît depuis quelques minutes ; si vous savez déjà sur quoi vous voulez travailler, prenez ce parcours-là. Vous pourrez changer à tout moment sans rien perdre.</div>'+
+  '<button class="btn bs" onclick="go(\'pick\')">Choisir moi-même un autre parcours</button></div>';
+}
+function setParcours(k){S.parcours=k;go('deg');}
+function rDeg(s){$('nav').innerHTML='';
+  var warn=IND[S.parcours].sym?'<div class="note" style="margin-top:10px">Pour ce parcours, l’enjeu n’est pas d’en faire plus, mais de tenir le peu sans le négocier. Le degré élevé reste possible, mais ce n’est pas là qu’est le travail.</div>':'';
+  function row(n,t,d){return '<button class="opt'+(S.deg===n?' sel':'')+'" onclick="S.deg='+n+';render()"><b>'+t+'</b><span>'+d+'</span></button>';}
+  var six=IND[S.parcours].sym?'':row(6,'6 gestes','Deux par registre. Pour qui a besoin de faire.');
+  s.innerHTML='<div class="pad fi"><h2 style="font-size:21px;margin-bottom:6px">Combien de gestes par jour ?</h2>'+
+  '<p class="muted" style="margin-bottom:18px">3 est le standard. Vous pourrez changer à tout moment, y compris en cours de journée.</p>'+
+  row(1,'1 geste','Le geste-ancre, seul. Les jours bas ou chargés.')+
+  row(3,'3 gestes','Un par registre — corps, pensées, environnement.')+
+  row(4,'4 gestes','Les trois, plus un geste libre.')+
+  six+warn+
+  '<button class="btn bp" style="margin-top:16px" onclick="go(\'mode\')">Continuer</button></div>';
+}
+function rMode(s){$('nav').innerHTML='';
+  function row(id,t,d){return '<button class="opt'+(S.mode===id?' sel':'')+'" onclick="S.mode=\''+id+'\';render()"><b>'+t+'</b><span>'+d+'</span></button>';}
+  var time=(S.mode==='rdv'||S.mode==='accomp')?'<div class="card" style="margin-top:4px"><p class="lbl" style="margin-bottom:8px">Votre rendez-vous</p><div class="timerow"><span class="muted">Heure</span><input type="time" value="'+S.remind+'" onchange="S.remind=this.value;sv()"></div></div>':'';
+  s.innerHTML='<div class="pad fi"><h2 style="font-size:21px;margin-bottom:6px">À quel point l’application vous sollicite ?</h2>'+
+  '<p class="muted" style="margin-bottom:18px">Modifiable dans les réglages.</p>'+
+  row('libre','Présence libre','Elle ne dit rien, n’attend rien. Vous venez quand vous venez.')+
+  row('rdv','Rendez-vous','Une heure fixe et le repère de votre progression.')+
+  row('accomp','Accompagnement','L’heure fixe, les passages de semaine, et un mot dans les creux.')+
+  time+
+  '<button class="btn bp" style="margin-top:16px" onclick="finishOnboard()">C’est parti</button></div>';
+}
+function finishOnboard(){S.scr='home';S.tab='j';sv();render();}
+
+function coachLine(){
+  if(S.mode==='libre')return '';
+  var w=week(),newWeek=(S.day-1)%7===0;
+  var txt;
+  if(S.mode==='accomp'){
+    if(newWeek&&S.day>1)txt='Semaine '+w+', phase '+phase()+'. On continue, à votre rythme.';
+    else if(S.done.length>=2&&S.done.indexOf(S.day-1)<0&&S.day>3)txt='Si c’est lourd en ce moment, gardez un seul geste aujourd’hui. C’est suffisant.';
+    else txt='Votre rendez-vous du jour vous attend. À votre rythme.';
+  } else {
+    txt='Votre rendez-vous du jour\u202F: vos gestes vous attendent.';
+  }
+  return '<div class="coach"><p class="lbl">Votre coach</p>'+txt+'</div>';
+}
+
+/* ---------- Écran du jour ---------- */
+function rJ(s){
+  var viewing=vd(),isPast=viewing<S.day;
+  var ind=IND[S.parcours],isDone=S.done.indexOf(viewing)>=0,codes=todayGestes(viewing);
+  function card(code){var g=G[code];
+    var fb=S.fb[code]||0;
+    var br=g.br?'<button class="mini g" onclick="breathe()">Guider la respiration</button>':'';
+    var sas=g.sas?'<button class="mini g" onclick="openSas()">Ouvrir le sas</button>':'';
+    return '<div class="card gest"><div class="gh"><span class="gn" style="color:'+AXC[g.a]+'"><span class="dot" style="background:'+AXC[g.a]+'"></span>'+AXN[g.a]+' · '+g.n+'</span><span class="dur">'+g.d+'</span></div>'+
+    '<p class="gtx">'+g.c+'</p>'+
+    '<p class="ben"><b>Ce que ça fait\u202F:</b> '+(GB[code]||'')+'</p>'+
+    '<div class="gact">'+br+sas+
+    '<span style="flex:1"></span>'+
+    '<button class="mini info" aria-label="À quoi servent le coeur et la croix" onclick="expliqueFb()">?</button>'+
+    '<button class="thumb'+(fb===1?' on':'')+'" title="me convient" aria-label="Ce geste me convient" onclick="setFb(\''+code+'\',1)">\u2665</button>'+
+    '<button class="thumb'+(fb===-1?' on':'')+'" title="pas pour moi" aria-label="Ce geste n\u2019est pas pour moi" onclick="setFb(\''+code+'\',-1)">\u2715</button></div></div>';
+  }
+  var gh;
+  if(S.deg===6&&codes.length===6){
+    var moments=[['Au réveil',0,2],['Dans la journée',2,4],['En soirée',4,6]];
+    gh='<div class="note" style="margin-bottom:14px">Six gestes d’affilée, c’est beaucoup. Répartis sur la journée, ils pèsent moins et s’ancrent mieux — voici une façon de les poser.</div>';
+    gh+=moments.map(function(m){return '<p class="phband" style="margin-top:6px">'+m[0]+'</p>'+codes.slice(m[1],m[2]).map(card).join('');}).join('');
+  } else {
+    gh=codes.map(card).join('');
+  }
+  var memo=esc(S.memos[viewing]||'');
+  function db(n){var dis=(ind.sym&&n===6);return '<button class="'+(S.deg===n?'sel':'')+'"'+(dis?' disabled style="opacity:.35"':'')+' onclick="S.deg='+n+';sv();rJ($(\'scr\'))">'+n+'</button>';}
+  var prevBtn='<button class="mini" onclick="viewDay('+(viewing-1)+')"'+(viewing<=1?' disabled style="opacity:.35"':'')+'>Jour '+(viewing-1)+'</button>';
+  var nextBtn='<button class="mini" onclick="viewDay('+(viewing+1)+')">'+(viewing+1>=S.day?'Aujourd’hui':'Jour '+(viewing+1))+'</button>';
+  var banner=isPast?'<div class="coach" style="background:var(--surf);color:var(--ink);border:1px solid var(--bd)"><p class="lbl" style="color:var(--muted);margin-bottom:6px">Vous consultez un jour passé</p>Jour '+viewing+'. Vous pouvez relire et compléter vos notes. Votre progression reste au jour '+S.day+'.<div class="gact" style="margin-top:10px">'+prevBtn+nextBtn+'</div></div>':'';
+  var head='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><p class="lbl">Jour '+viewing+' · Semaine '+week(viewing)+' · '+phase(viewing)+'</p><span class="chip">'+ind.lb+'</span></div>'+
+  '<h2 style="font-size:19px;margin-bottom:14px">'+(S.deg===1?'Votre geste du jour':'Vos '+codes.length+' gestes du jour')+'</h2>';
+  var degbar=isPast?'':'<div class="degbar"><p class="lbl">Aujourd’hui</p><div class="seg">'+db(1)+db(3)+db(4)+db(6)+'</div></div>';
+  var notes='<p class="lbl" style="margin:18px 0 7px">Notes</p>'+
+  '<textarea rows="3" placeholder="Un mot, si vous le souhaitez. Ou rien." oninput="S.memos['+viewing+']=this.value;sv()">'+memo+'</textarea>';
+  var notes=releveBloc(viewing)+notes;
+  var actions;
+  if(isPast){
+    actions='<div style="margin-top:18px"><button class="btn bp" onclick="backToday()">Revenir à aujourd’hui</button></div>';
+  } else {
+    actions='<div style="margin-top:18px">'+
+    (isDone?'<button class="btn bs" disabled>Rendez-vous tenu pour aujourd’hui</button>':'<button class="btn bp" onclick="done()">C’est fait pour aujourd’hui</button>')+
+    (S.day>1?'<button class="btn bs" style="font-size:13px;padding:11px" onclick="viewDay('+(S.day-1)+')">Voir un jour précédent</button>':'')+
+    '</div>';
+  }
+  s.innerHTML='<div class="pad fi">'+(isPast?banner:coachLine())+head+degbar+gh+notes+actions+'</div>';
+}
+/* Relevé du jour : une touche, cinq états, jamais obligatoire.
+   Aucun chiffre n'est montré à l'utilisateur, ici ni ailleurs. */
+var REL=['Très dur','Difficile','Correct','Plutôt bien','Vraiment bien'];
+function releveBloc(d){
+  var cur=(typeof S.releve[d]==='number')?S.releve[d]:-1;
+  var btns=REL.map(function(t,i){
+    return '<button class="rel'+(cur===i?' sel':'')+'" onclick="setReleve('+d+','+i+')">'+t+'</button>';
+  }).join('');
+  return '<p class="lbl" style="margin:20px 0 7px">La journée</p>'+
+  '<p class="muted" style="font-size:13px;margin:0 0 9px">Comment elle a été, en un mot. Vous pouvez sauter\u202F: ce n’est pas noté, et ça ne juge pas vos gestes.</p>'+
+  '<div class="relrow">'+btns+'</div>';
+}
+function setReleve(d,i){
+  if(S.releve[d]===i)delete S.releve[d];else S.releve[d]=i;
+  sv();rJ($('scr'));
+}
+function expliqueFb(){
+  sheet('ovF','Le cœur et la croix','Vos réponses changent la suite',
+  '<p style="font-size:13.5px;color:#4d4940;line-height:1.7;margin:0 0 12px">'+
+  '<b>Le cœur</b> — ce geste vous va. Il vous sera proposé en priorité chaque fois qu’il est pertinent pour votre parcours, et il sera retenu pour la suite.</p>'+
+  '<p style="font-size:13.5px;color:#4d4940;line-height:1.7;margin:0 0 12px">'+
+  '<b>La croix</b> — ce geste n’est pas pour vous. Il disparaît de votre rotation à partir de demain, et ne revient plus. Vous pouvez toujours revenir dessus.</p>'+
+  '<div class="note">Ce n’est pas une note. C’est la seule façon que l’application a de savoir ce qui vous convient — et au bout des vingt-huit jours, elle vous proposera un parcours construit uniquement avec les gestes que vous avez aimés.</div>');
+}
+function setFb(code,v){
+  var was=S.fb[code]||0,now=(was===v?0:v);
+  S.fb[code]=now;
+  if(now===-1){S.fbd[code]=S.day;toast('Écarté. Ce geste ne reviendra plus.');}
+  else if(now===1){toast('Retenu. Il vous sera proposé en priorité.');}
+  else if(was===-1){delete S.fbd[code];toast('Remis dans la rotation.');}
+  else if(was===1){toast('Retiré de vos gestes retenus.');}
+  sv();rJ($('scr'));
+}
+function done(){
+  if(S.done.indexOf(S.day)<0){
+    var justDone=S.day;
+    S.done.push(justDone);
+    if(justDone>=28){S.fin=1;sv();go('fin');return;}
+    S.day++;sv();
+    var w=justDone/7;
+    if(w===1||w===2||w===3){if(S.seuils.indexOf(w)<0){S.seuils.push(w);sv();rJ($('scr'));return seuil(w);}}
+  }
+  rJ($('scr'));
+}
+
+/* ---------- Seuil de semaine ---------- */
+function seuil(w){
+  var d=SEUILS[w];
+  var lien=d.lien?'<div class="card" style="margin-top:4px"><p style="font-size:13px;color:#5f5a4d;line-height:1.65;margin:0 0 10px"><i>Comprendre ne suffit pas — la méthode des micro-gestes pour changer sans se forcer.</i> Toute la théorie derrière cette application y est exposée : d’où viennent ces gestes, pourquoi la volonté échoue si souvent, et comment repérer vos propres seuils. L’application en est la mise en pratique ; le livre en est l’explication.</p><div class="gact"><a class="mini g" href="'+CFG.livre+'" target="_blank" rel="noopener">Voir le livre</a><a class="mini" href="'+CFG.site+'" target="_blank" rel="noopener">Le cabinet</a></div></div>':'';
+  sheet('ovW','Fin de la semaine '+w,d.t,'<p style="font-size:14px;color:#4d4940;line-height:1.7;margin:0 0 14px">'+d.c+'</p>'+lien);
+}
+
+/* ---------- Comparaison départ / arrivée ---------- */
+function peutComparer(){
+  if(!S.qhist||S.qhist.length<2)return false;
+  return !!(S.qhist[0].scores&&S.qhist[S.qhist.length-1].scores);
+}
+function rCompare(s){$('nav').innerHTML='';
+  if(!peutComparer())return rResult(s);
+  var h0=S.qhist[0],h1=S.qhist[S.qhist.length-1];
+  var base=h0.scores||{},last=h1.scores||{};
+  var keys=Object.keys(IND).sort(function(a,b){return (last[b]||0)-(last[a]||0);}).slice(0,5);
+  var dsum=0,dn=0;
+  Object.keys(IND).forEach(function(k){if(base[k]!=null&&last[k]!=null){dsum+=last[k]-base[k];dn++;}});
+  var delta=dn?dsum/dn:0;
+
+  function barres(k){
+    var b=Math.max(3,(base[k]||0)/3*100),l=Math.max(3,(last[k]||0)/3*100);
+    return '<div style="margin-bottom:14px">'+
+    '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">'+
+    '<span style="font-size:13.5px;font-weight:500">'+IND[k].lb+'</span>'+
+    (k===S.parcours?'<span class="chip">votre parcours</span>':'')+'</div>'+
+    '<div class="brow"><span class="bl">Départ</span><div class="btr"><div class="bfi" style="width:'+b.toFixed(0)+'%;background:#cfc7b3"></div></div></div>'+
+    '<div class="brow"><span class="bl">Aujourd’hui</span><div class="btr"><div class="bfi" style="width:'+l.toFixed(0)+'%;background:var(--gold)"></div></div></div></div>';
+  }
+
+  var t,c;
+  if(delta<=-0.35){t='C’est plus léger';c='Sur l’ensemble des douze registres, vos réponses sont nettement moins marquées qu’au premier jour. Ce n’est pas rien\u202F: vingt-huit jours, ce n’est pas long, et ce sont des gestes d’une minute qui ont fait ce déplacement.';}
+  else if(delta<=-0.1){t='Ça a bougé, un peu';c='Le mouvement est léger, dans le sens du desserrement. C’est le rythme habituel — les micro-gestes travaillent lentement, et l’essentiel de leur effet se voit sur des mois, pas sur quatre semaines.';}
+  else if(delta<0.1){t='À peu près au même niveau';c='Vos réponses sont proches de celles du départ. Ce n’est pas un échec\u202F: rester stable pendant une période chargée est déjà un résultat, et ce que vous avez installé ne se lit pas forcément dans un questionnaire. Regardez plutôt si un geste se fait maintenant sans y penser.';}
+  else {t='Vos réponses sont plus marquées';c='Elles sont plus fortes qu’au départ. Deux raisons possibles, et la seconde est la plus fréquente\u202F: soit la période est réellement plus dure, soit vous vous voyez plus nettement qu’il y a un mois et vous répondez avec moins de complaisance. On observe souvent ça chez les gens qui ont travaillé sérieusement. Dans les deux cas, ce n’est pas un recul.';}
+
+  var nk=S.suggest;
+  s.innerHTML='<div class="pad fi"><div style="height:22px"></div>'+
+  '<p class="lbl" style="margin-bottom:10px">Vingt-huit jours plus tard</p>'+
+  '<h1 style="font-size:29px;line-height:1.12;margin-bottom:12px">'+t+'</h1>'+
+  '<p style="font-size:14px;color:#4d4940;line-height:1.7;margin:0 0 20px">'+c+'</p>'+
+  '<div class="card">'+keys.map(barres).join('')+
+  '<p style="font-size:12px;color:#6a6456;line-height:1.6;margin:2px 0 0">Les cinq registres les plus présents aujourd’hui. À lire avec prudence\u202F: des réponses fortes un jour donné ont tendance à redescendre d’elles-mêmes à la fois suivante, sans que rien n’ait changé. Le signe le plus fiable n’est pas ici — c’est qu’un geste se fasse maintenant sans que vous ayez à y penser.</p></div>'+
+  '<div class="sep"></div>'+
+  '<p class="lbl" style="margin-bottom:8px">Le cycle suivant</p>'+
+  '<div class="card"><p style="font-size:13.5px;color:#5f5a4d;line-height:1.7;margin:0 0 12px">D’après vos réponses d’aujourd’hui, le parcours qui vous irait le mieux maintenant\u202F: <b>'+IND[nk].lb+'</b>'+(nk===S.parcours?' — le même qu’au départ, ce qui arrive souvent quand le travail n’est pas terminé.':' — différent de celui que vous venez de faire.')+'</p>'+
+  '<button class="btn bp" style="margin-bottom:6px" onclick="nouveauCycle(\''+nk+'\')">Commencer ce parcours</button>'+
+  '<button class="btn bs" style="margin:0" onclick="go(\'pick2\')">Choisir un autre parcours</button></div>'+
+  '<button class="btn bs" style="margin-top:14px" onclick="go(\'fin\')">Plus tard</button></div>';
+}
+
+/* Parcours sur mesure : construit uniquement avec les gestes que la personne a
+   aimés. Complété par son parcours d'origine si une catégorie est trop maigre. */
+function aimes(){var o=[];for(var k in S.fb){if(S.fb[k]===1&&G[k])o.push(k);}return o;}
+function peutSurMesure(){
+  var a=aimes(),ax={C:0,P:0,E:0};
+  a.forEach(function(c){ax[G[c].a]++;});
+  return a.length>=4&&(ax.C>0)&&(ax.P+ax.E>=2);
+}
+function construitSurMesure(){
+  var a=aimes(),src=IND[S.parcours]||IND.sur,L={C:[],P:[],E:[]};
+  a.forEach(function(c){L[G[c].a].push(c);});
+  ['C','P','E'].forEach(function(ax){
+    (src[ax]||[]).forEach(function(c){if(L[ax].length<4&&L[ax].indexOf(c)<0&&!ecarte(c,1e9))L[ax].push(c);});
+    if(!L[ax].length)L[ax]=src[ax].slice(0,3);
+  });
+  IND.perso={lb:'Votre sélection',sl:'Vos gestes retenus',sym:0,C:L.C,P:L.P,E:L.E};
+  S.persoL=L;
+  return L;
+}
+function lancerSurMesure(){construitSurMesure();nouveauCycle('perso');}
+
+/* Nouveau cycle : on archive le précédent (notes, jours tenus, relevés) et on
+   repart à zéro. Les gestes écartés restent écartés — la personne n'a pas changé
+   d'avis en changeant de parcours. */
+function nouveauCycle(k){
+  S.arch.push({cycle:S.cycle,parcours:S.parcours,memos:S.memos,done:S.done,releve:S.releve});
+  S.cycle++;S.parcours=k;S.memos={};S.done=[];S.releve={};S.day=1;S.seuils=[];S.fin=0;S.vday=null;
+  sv();go('deg');
+}
+
+/* ---------- Jour 28 ---------- */
+function rFin(s){$('nav').innerHTML='';
+  var tenus=S.done.length;
+  var aimes=Object.keys(S.fb).filter(function(k){return S.fb[k]===1;});
+  var sur=peutSurMesure();
+  var liste=aimes.length?'<div class="card"'+(sur?' style="border-color:var(--gold)"':'')+'><p class="lbl" style="margin-bottom:9px">Les gestes que vous avez retenus</p>'+
+    aimes.map(function(c){var g=G[c];return '<div style="display:flex;gap:8px;align-items:baseline;margin-bottom:7px"><span class="dot" style="background:'+AXC[g.a]+'"></span><span style="font-size:13.5px">'+g.n+'</span></div>';}).join('')+
+    (sur
+      ? '<p style="font-size:13px;color:#5f5a4d;margin:10px 0 11px;line-height:1.65">Vous en avez assez retenu pour repartir sur un parcours construit avec eux seuls. Vingt-huit jours, uniquement ce qui vous va.</p><button class="mini g" onclick="lancerSurMesure()">Faire mon parcours sur mesure</button>'
+      : '<p style="font-size:12.5px;color:#6a6456;margin:8px 0 0;line-height:1.6">Ce sont eux qui restent. Gardez-en deux, pas dix.</p>')+
+    '</div>':'';
+  s.innerHTML='<div class="pad fi"><div style="height:26px"></div>'+mark()+
+  '<h1 style="font-size:30px;line-height:1.1;margin-bottom:12px;text-align:center">Vingt-huit jours</h1>'+
+  '<p class="muted" style="text-align:center;margin-bottom:20px">'+tenus+' rendez-vous tenus. Ce n’est pas un score : c’est simplement ce qui s’est passé.</p>'+
+  '<div class="card"><p style="font-size:13.5px;color:#5f5a4d;line-height:1.75;margin:0">Vous n’avez pas acquis de la volonté. Vous avez rendu quelques gestes assez petits et assez proches pour qu’ils se fassent sans décision. C’est tout le principe, et il ne s’use pas : vous pouvez recommencer un cycle sur un autre parcours, ou simplement garder ce qui tient.</p></div>'+
+  liste+
+  '<div class="card" style="border-color:var(--gold)"><p class="lbl" style="margin-bottom:8px">Si vous voulez voir ce qui a bougé</p>'+
+  '<p style="font-size:13.5px;color:#5f5a4d;line-height:1.7;margin:0 0 11px">Vous pouvez repasser le questionnaire — dans un ordre différent, pour ne pas vous rejouer de mémoire — et comparer avec vos réponses du premier jour. C’est facultatif\u202F: si vous n’en avez pas envie, sautez-le, ça ne change rien à votre parcours.</p>'+
+  '<button class="mini g" onclick="startQuiz(1)">Repasser le questionnaire</button></div>'+
+  (peutComparer()?'<button class="btn bs" onclick="go(\'compare\')">Revoir ma comparaison</button>':'')+
+  '<button class="btn bp" onclick="S.scr=\'home\';S.tab=\'j\';sv();render()">Revenir à mon parcours</button>'+
+  '<button class="btn bs" onclick="go(\'pick2\')">Commencer un autre parcours</button>'+
+  '<button class="btn bs" onclick="partager()">Offrir l’application à quelqu’un</button>'+
+  '<div class="sep"></div>'+
+  '<div class="card"><p class="lbl" style="margin-bottom:9px">Pour aller plus loin</p>'+
+  '<p style="font-size:13.5px;color:#5f5a4d;line-height:1.7;margin:0 0 12px">Cette application est tirée de <i>Comprendre ne suffit pas</i>, où j’explique d’où viennent ces gestes, pourquoi la volonté échoue si souvent, et comment repérer vos propres seuils. Et si vous voulez travailler cela avec quelqu’un, je reçois en cabinet à '+CFG.ville+'.</p>'+
+  '<div class="gact"><a class="mini g" href="'+CFG.livre+'" target="_blank" rel="noopener">Le livre</a><a class="mini" href="'+CFG.site+'" target="_blank" rel="noopener">Le cabinet</a></div>'+
+  '<p class="sig" style="margin:12px 0 0">Yann Riguidel, praticien en hypnose</p></div></div>';
+}
+function partager(){
+  var d={title:'Micro-gestes',text:'Vingt-huit jours, quelques micro-gestes par jour. Gratuit, sans compte.',url:CFG.appUrl};
+  if(navigator.share){navigator.share(d).catch(function(){});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(CFG.appUrl).then(function(){toast('Lien copié.');});}
+  else toast(CFG.appUrl);
+}
+
+/* ---------- Parcours ---------- */
+function rParcours(s){
+  var bands='';
+  for(var w=0;w<4;w++){bands+='<div class="phband">Semaine '+(w+1)+' · '+PHASES[w]+'</div><div class="cal">';
+    for(var d2=w*7+1;d2<=w*7+7;d2++){var c2=S.done.indexOf(d2)>=0?'dn':d2===S.day?'td':d2>S.day?'ft':'';var clk=d2<=S.day?' onclick="viewDay('+d2+')" style="cursor:pointer"':'';bands+='<div class="cd '+c2+'"'+clk+'>'+d2+'</div>';}
+    bands+='</div>';}
+  var fin=S.fin?'<button class="btn bs" style="margin-top:14px" onclick="go(\'fin\')">Revoir la clôture des 28 jours</button>':'';
+  var courbe=sparkline();
+  s.innerHTML='<div class="pad fi"><h2 style="font-size:22px;margin-bottom:4px">Votre parcours</h2>'+
+  '<p class="muted" style="margin-bottom:18px">Jour '+S.day+' · Semaine '+week()+', phase '+phase()+'. Touchez un jour atteint pour le revoir.</p>'+
+  bands+courbe+fin+
+  '<div class="sep"></div><div class="card"><p class="lbl" style="margin-bottom:8px">L’esprit du parcours</p>'+
+  '<p style="font-size:13px;color:#5f5a4d;line-height:1.7;margin:0">Les gestes changent chaque semaine, pour épouser la phase du moment. Un jour sauté ne se rattrape pas : vous reprenez simplement le lendemain. Le corps note tout — les effets viennent souvent après.</p></div>'+
+  '<div class="card" style="margin-top:8px"><p class="lbl" style="margin-bottom:8px">D’où vient tout ceci</p>'+
+  '<p style="font-size:13px;color:#5f5a4d;line-height:1.7;margin:0 0 12px">Cette application est la mise en pratique de <i>Comprendre ne suffit pas</i>, de Yann Riguidel. La théorie complète y est : pourquoi comprendre son fonctionnement ne le change pas, d’où viennent les micro-gestes, et comment repérer les seuils qui sont les vôtres. Rien à acheter pour continuer ici — l’application reste entièrement gratuite.</p>'+
+  '<div class="gact"><a class="mini g" href="'+CFG.livre+'" target="_blank" rel="noopener">Voir le livre</a><a class="mini" href="'+CFG.site+'" target="_blank" rel="noopener">Le cabinet</a></div></div></div>';
+}
+
+/* Courbe des relevés — volontairement muette : pas d'axe, pas de chiffre,
+   pas de moyenne, pas de flèche de tendance. Une ligne qu'on regarde. */
+function sparkline(){
+  var pts=[],n=0;
+  for(var d=1;d<=28;d++){if(typeof S.releve[d]==='number'){pts.push([d,S.releve[d]]);n++;}}
+  if(n<3)return '<div class="sep"></div><div class="card"><p class="lbl" style="margin-bottom:8px">La journée</p>'+
+    '<p style="font-size:13px;color:#5f5a4d;line-height:1.65;margin:0">Quand vous aurez noté quelques journées, une ligne apparaîtra ici. Elle ne dira rien\u202F: elle montrera, simplement.</p></div>';
+  var W=340,H=76,PADX=6,PADY=10;
+  function X(d){return PADX+(d-1)/27*(W-2*PADX);}
+  function Y(v){return H-PADY-(v/4)*(H-2*PADY);}
+  var seg='',prev=null,dots='';
+  pts.forEach(function(p){
+    if(prev&&p[0]-prev[0]<=3){seg+='<line x1="'+X(prev[0]).toFixed(1)+'" y1="'+Y(prev[1]).toFixed(1)+'" x2="'+X(p[0]).toFixed(1)+'" y2="'+Y(p[1]).toFixed(1)+'" stroke="#C4973A" stroke-width="1.8" stroke-linecap="round"/>';}
+    dots+='<circle cx="'+X(p[0]).toFixed(1)+'" cy="'+Y(p[1]).toFixed(1)+'" r="2.1" fill="#C4973A"/>';
+    prev=p;
+  });
+  var seps='';
+  for(var w=1;w<4;w++){var x=X(w*7+.5).toFixed(1);seps+='<line x1="'+x+'" y1="4" x2="'+x+'" y2="'+(H-4)+'" stroke="#e3ddd0" stroke-width="1"/>';}
+  var today='<line x1="'+X(Math.min(S.day,28)).toFixed(1)+'" y1="4" x2="'+X(Math.min(S.day,28)).toFixed(1)+'" y2="'+(H-4)+'" stroke="#d6cdb8" stroke-width="1" stroke-dasharray="2 3"/>';
+  return '<div class="sep"></div><div class="card"><p class="lbl" style="margin-bottom:9px">La journée</p>'+
+  '<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="'+H+'" role="img" aria-label="Ligne de vos relevés quotidiens">'+seps+today+seg+dots+'</svg>'+
+  '<div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:2px"><span>Jour 1</span><span>Jour 28</span></div>'+
+  '<p style="font-size:12.5px;color:#6a6456;line-height:1.6;margin:9px 0 0">Les jours sans relevé sont laissés vides. Une ligne qui monte, qui descend ou qui reste plate ne dit rien de votre travail\u202F: elle dit ce qu’ont été vos journées.</p></div>';
+}
+
+/* ---------- Réglages ---------- */
+function rReglages(s){
+  function dbtn(n){var dis=(IND[S.parcours].sym&&n===6);return '<button class="'+(S.deg===n?'sel':'')+'"'+(dis?' disabled style="opacity:.4"':'')+' onclick="S.deg='+n+';sv();rReglages($(\'scr\'))">'+n+'</button>';}
+  function mrow(id,t,d){return '<button class="opt'+(S.mode===id?' sel':'')+'" onclick="S.mode=\''+id+'\';sv();rReglages($(\'scr\'))"><b>'+t+'</b><span>'+d+'</span></button>';}
+  var time=(S.mode!=='libre')?'<div class="card"><p class="lbl" style="margin-bottom:8px">Votre rendez-vous</p><div class="timerow"><span class="muted">Heure</span><input type="time" value="'+S.remind+'" onchange="S.remind=this.value;sv()"></div></div>':'';
+  var inst=(!STANDALONE)?'<div class="sep"></div><p class="lbl" style="margin-bottom:10px">Installer</p>'+
+    '<div class="card"><p style="font-size:13px;color:#5f5a4d;line-height:1.6;margin:0 0 10px">Installée sur l’écran d’accueil, l’application s’ouvre sans connexion et vos données sont conservées de façon plus fiable.</p>'+
+    (IS_IOS?'<button class="mini" onclick="iosHelp()">Comment faire</button>':'<button class="mini" onclick="doInstall()">Installer</button>')+'</div>':'';
+  s.innerHTML='<div class="pad fi"><h2 style="font-size:22px;margin-bottom:18px">Réglages</h2>'+
+  '<p class="lbl" style="margin-bottom:10px">Nombre de gestes par jour</p><div class="seg">'+dbtn(1)+dbtn(3)+dbtn(4)+dbtn(6)+'</div>'+
+  '<p class="muted" style="margin:-2px 0 18px;font-size:13px">3 gestes : le standard.</p>'+
+  '<p class="lbl" style="margin-bottom:10px">Mode d’accompagnement</p>'+
+  mrow('libre','Présence libre','Aucun rappel.')+mrow('rdv','Rendez-vous','Heure fixe et repère de phase.')+mrow('accomp','Accompagnement','Heure fixe, passages de semaine, main tendue.')+time+
+  '<div class="sep"></div><p class="lbl" style="margin-bottom:10px">Questionnaire</p>'+
+  '<div class="card"><p style="font-size:13px;color:#5f5a4d;line-height:1.6;margin:0 0 10px">Vous pouvez le repasser quand vous voulez — les affirmations seront dans un autre ordre — et comparer avec le premier jour. Facultatif, et sans effet sur votre parcours en cours.</p>'+
+  '<div class="gact"><button class="mini" onclick="startQuiz(1)">Repasser le questionnaire</button>'+
+  (peutComparer()?'<button class="mini g" onclick="go(\'compare\')">Voir ma comparaison</button>':'')+'</div></div>'+
+  '<div class="sep"></div><p class="lbl" style="margin-bottom:10px">Vos notes</p>'+
+  '<div class="card"><p style="font-size:13px;color:#5f5a4d;line-height:1.6;margin:0 0 10px">Vos notes et la trace de vos gestes, à garder pour vous.</p>'+
+  '<div class="gact"><button class="mini" onclick="exportNotes(\'txt\')">Exporter .txt</button><button class="mini" onclick="exportNotes(\'md\')">Exporter .md</button></div></div>'+
+  '<div class="sep"></div><p class="lbl" style="margin-bottom:10px">Code de reprise</p>'+
+  '<div class="card"><p style="font-size:13px;color:#5f5a4d;line-height:1.6;margin:0 0 10px">Certains navigateurs effacent vos données à la fermeture. Gardez ce code ailleurs (une note, un mail)\u202F: il restaure votre parcours, votre jour et vos notes — ici ou sur un autre appareil.</p>'+
+  '<textarea id="codeOut" rows="3" readonly onclick="this.select()" style="font-size:12px">'+makeCode()+'</textarea>'+
+  '<button class="mini" style="margin-top:8px" onclick="copyCode()">Copier mon code</button></div>'+
+  inst+
+  '<div class="sep"></div><p class="lbl" style="margin-bottom:10px">À propos</p>'+
+  '<div class="card"><p style="font-size:13px;color:#5f5a4d;line-height:1.7;margin:0 0 12px">Micro-gestes est une application gratuite, sans compte et sans publicité, conçue par <b>Yann Riguidel</b>, praticien en hypnose à '+CFG.ville+'. Elle met en pratique <i>Comprendre ne suffit pas</i>, son livre sur la méthode des micro-gestes.</p>'+
+  '<div class="gact"><a class="mini g" href="'+CFG.livre+'" target="_blank" rel="noopener">Le livre</a><a class="mini" href="'+CFG.site+'" target="_blank" rel="noopener">Le cabinet</a><button class="mini" onclick="partager()">Partager</button></div></div>'+
+  '<div class="note" style="margin-top:10px">Cette application n’est pas un soin et ne remplace pas un avis médical. En cas de souffrance importante, parlez-en à un professionnel de santé.</div>'+
+  '<button class="btn bs" style="margin-top:14px" onclick="go(\'pick\')">Changer de parcours</button></div>';
+}
+function exportNotes(fmt){
+  var md=fmt==='md',L=[],h1=md?'# ':'',h2=md?'## ':'',h3=md?'### ':'';
+  L.push(h1+'Micro-gestes — mes notes');L.push('');
+  function bloc(parcours,memos,done,releve,titre){
+    L.push(h2+titre+' — '+IND[parcours].lb);L.push('');
+    var days=[];for(var k in memos)days.push(+k);done.forEach(function(d){if(days.indexOf(d)<0)days.push(d)});days.sort(function(a,b){return a-b});
+    if(!days.length){L.push('(Aucune note.)');L.push('');return;}
+    days.forEach(function(d){
+      var tag=[];if(done.indexOf(d)>=0)tag.push('rendez-vous tenu');
+      if(typeof releve[d]==='number')tag.push('journée : '+REL[releve[d]].toLowerCase());
+      L.push(h3+'Jour '+d+(tag.length?' — '+tag.join(', '):''));
+      var m=memos[d];if(m&&m.trim()){L.push('');L.push((md?'> ':'')+m.trim());}L.push('');
+    });
+  }
+  (S.arch||[]).forEach(function(a){bloc(a.parcours,a.memos||{},a.done||[],a.releve||{},'Cycle '+a.cycle);});
+  bloc(S.parcours,S.memos,S.done,S.releve,'Cycle '+S.cycle);
+  var blob=new Blob([L.join('\n')],{type:'text/plain;charset=utf-8'}),u=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=u;a.download='micro-gestes-notes.'+(md?'md':'txt');document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u)},800);
+}
+
+/* ---------- Overlays ---------- */
+function sheet(id,lbl,titre,html,btn){
+  var ov=document.createElement('div');ov.className='ov';ov.id=id;
+  ov.innerHTML='<div class="sheet"><p class="lbl" style="margin-bottom:4px">'+lbl+'</p><h2 style="font-size:21px;margin-bottom:12px">'+titre+'</h2>'+html+
+  '<button class="btn bs" style="margin-top:6px" onclick="closeOv(\''+id+'\')">'+(btn||'Fermer')+'</button></div>';
+  $('app').appendChild(ov);return ov;
+}
+function breathe(){
+  var ov=sheet('ovB','Guide de respiration','Laissez-vous porter',
+    '<div class="breathwrap"><div class="bcircle" id="bc">Inspirez</div></div>'+
+    '<p class="muted" style="text-align:center;margin:6px 0 16px">Suivez le cercle. Inspirez quand il grandit, expirez quand il se réduit.</p>','Terminer');
+  var lab=$('bc'),t0=Date.now();
+  ov._iv=setInterval(function(){var p=((Date.now()-t0)%11000)/11000;lab.textContent=p<.36?'Inspirez':p<.45?'Retenez':'Expirez';},120);
+}
+function openSas(){
+  sheet('ovS','Sas de décharge','Posez ce qui pèse',
+  '<p class="muted" style="margin-bottom:12px">Écrivez sans filtre, sans vous relire. Quand vous déposez, le texte disparaît — rien n’est conservé.</p>'+
+  '<textarea id="sasT" rows="6" placeholder="…"></textarea>'+
+  '<button class="btn bp" style="margin-top:12px" onclick="dropSas()">Déposer</button>');
+}
+function dropSas(){var t=$('sasT');t.style.transition='opacity 1s';t.style.opacity='0';setTimeout(function(){t.value='';t.style.opacity='1';closeOv('ovS');toast('Déposé. Rien n’a été conservé.');},900);}
+function chaud(){
+  var list=['C22','C18','C20','C19','P01','O08'];
+  var html='<div class="note" style="margin-bottom:14px">Ce bouton n’est pas le programme du jour. C’est un secours, disponible à tout moment, pour l’instant où la tension déborde\u202F: l’envie de réagir, de fuir, de tout figer, ou une vague d’émotion. Un geste, tout de suite, où que vous soyez — prenez le premier qui vous parle, il n’y a pas de mauvais choix.</div>'+
+  list.map(function(code){var g=G[code];return '<div class="card"><div class="gn" style="color:'+AXC[g.a]+';margin-bottom:5px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;font-weight:500"><span class="dot" style="background:'+AXC[g.a]+'"></span>'+g.n+'</div><p class="gtx" style="margin:0">'+g.c+'</p></div>';}).join('');
+  sheet('ovC','À chaud','Quand ça monte, là, maintenant',html);
+}
+function closeOv(id){var o=$(id);if(o){if(o._iv)clearInterval(o._iv);o.remove();}}
+function toast(t){var d=document.createElement('div');d.textContent=t;d.style.cssText='position:absolute;bottom:90px;left:50%;transform:translateX(-50%);background:var(--navy);color:var(--cream);padding:10px 16px;border-radius:100px;font-size:13px;z-index:30;animation:fi .3s;max-width:88%;text-align:center';$('app').appendChild(d);setTimeout(function(){d.remove()},2400);}
+
+function nav(){
+  function tb(id,ic,t){return '<div class="tab'+(S.tab===id?' on':'')+'" role="button" tabindex="0" onclick="S.tab=\''+id+'\';render()"><b>'+ic+'</b>'+t+'</div>';}
+  $('nav').innerHTML='<button class="fab" onclick="chaud()">À chaud</button><div class="tabbar">'+tb('j','\u25C9','Aujourd’hui')+tb('p','\u25A6','Parcours')+tb('t','\u25CE','Trac')+tb('r','\u2699','Réglages')+'</div>';
+}
+
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
+/* ---------- Respirations du livret trac ---------- */
+var BR_MIN=.42,BR_MAX=1;
+var BREX=[
+ {id:'longue',g:'avant',n:'L’expiration longue',
+  how:'Inspirez par le nez, puis soufflez lentement, lèvres entrouvertes. L’expiration dure deux fois plus longtemps que l’inspiration.',
+  why:'Le cœur ralentit à chaque expiration : c’est le frein du nerf vague.',
+  rh:function(o){return 'Inspire 4, expire '+o.exp},
+  extra:{key:'exp',lab:'Expiration',vals:[[6,'6 temps'],[8,'8 temps']],def:1},
+  dur:[['3 cycles',{c:3}],['2 minutes',{s:120}],['5 minutes',{s:300}]],
+  ph:function(o){return [['Inspire',4,'in'],['Expire',o.exp,'out']]}},
+ {id:'soupir',g:'avant',n:'Le soupir double',
+  how:'Deux inspirations par le nez, la seconde courte pour finir de remplir. Puis une longue expiration par la bouche, jusqu’au bout.',
+  why:'La seconde inspiration rouvre les petites alvéoles des poumons, l’expiration longue ralentit le cœur. Un à trois soupirs suffisent sur le moment.',
+  rh:function(){return 'Inspire 2, encore 1, expire 6'},
+  dur:[['1 soupir',{c:1}],['3 soupirs',{c:3}]],dd:1,lab:'Soupir',
+  ph:function(){return [['Inspire',2,'in',.8],['Encore',1,'in',1],['Expire',6,'out']]}},
+ {id:'carree',g:'avant',n:'La respiration carrée',
+  how:'Quatre temps pour inspirer, quatre pour retenir, quatre pour expirer, quatre pour retenir. Retenir sans serrer la gorge.',
+  why:'Les pauses occupent l’attention et la ramènent dans le corps. Si la rétention vous crispe, revenez à l’expiration longue.',
+  rh:function(){return 'Inspire 4, bloque 4, expire 4, bloque 4'},
+  dur:[['4 cycles',{c:4}],['2 minutes',{s:120}],['5 minutes',{s:300}]],
+  ph:function(){return [['Inspire',4,'in'],['Bloque',4,'hold'],['Expire',4,'out'],['Bloque',4,'hold']]}},
+ {id:'fredon',g:'avant',n:'Fredonner bouche fermée',
+  how:'Inspirez par le nez, puis fredonnez un « mmm » grave, bouche fermée, mâchoire relâchée, épaules basses.',
+  why:'Le fredonnement allonge l’expiration tout seul et détend la mâchoire et la gorge, les premières à se verrouiller.',
+  rh:function(){return 'Inspire 4, fredonne 8'},
+  dur:[['1 minute',{s:60}],['2 minutes',{s:120}]],
+  ph:function(){return [['Inspire',4,'in'],['Fredonne',8,'out']]}},
+ {id:'lente',g:'quot',n:'La respiration lente',
+  how:'Environ six respirations par minute, au calme, une à trois fois par jour.',
+  why:'C’est l’entraînement qui rend l’expiration longue efficace le jour J.',
+  rh:function(){return 'Inspire 5, expire 5'},
+  dur:[['3 minutes',{s:180}],['5 minutes',{s:300}]],dd:1,
+  ph:function(){return [['Inspire',5,'in'],['Expire',5,'out']]}},
+ {id:'soupir5',g:'quot',n:'Le soupir double, cinq minutes',
+  how:'Le même soupir qu’avant la scène, enchaîné pendant cinq minutes, au calme.',
+  why:'L’effet augmente avec les jours de pratique : c’est une habitude, pas un remède ponctuel.',
+  rh:function(){return 'Inspire 2, encore 1, expire 6'},
+  dur:[['5 minutes',{s:300}]],
+  ph:function(){return [['Inspire',2,'in',.8],['Encore',1,'in',1],['Expire',6,'out']]}}
+];
+function brDef(e){var o={};if(e.extra)o[e.extra.key]=e.extra.vals[e.extra.def][0];return o;}
+function brFind(id){for(var i=0;i<BREX.length;i++)if(BREX[i].id===id)return BREX[i];}
+var BR={actx:null,wake:null,run:null};
+function brTone(kind,snd,vib){
+  if(vib&&navigator.vibrate){try{navigator.vibrate(kind==='hold'?[20,60,20]:35)}catch(e){}}
+  if(!snd)return;
+  try{BR.actx=BR.actx||new (window.AudioContext||window.webkitAudioContext)();
+    var f={in:523.25,out:392,hold:659.25,end:349.23}[kind]||440,o=BR.actx.createOscillator(),g=BR.actx.createGain(),t=BR.actx.currentTime;
+    o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.18,t+.04);g.gain.exponentialRampToValueAtTime(.001,t+.9);
+    o.connect(g);g.connect(BR.actx.destination);o.start(t);o.stop(t+1);}catch(e){}
+}
+function brEase(x){return -(Math.cos(Math.PI*x)-1)/2;}
+/* el : {disc,ring,word,count,status,pause}, cfg : {e,opts,dur,snd,vib,onEnd} */
+function brStart(el,cfg){
+  brStop();
+  if(cfg.snd){try{BR.actx=BR.actx||new (window.AudioContext||window.webkitAudioContext)();BR.actx.resume();}catch(e){}}
+  try{navigator.wakeLock.request('screen').then(function(w){BR.wake=w}).catch(function(){})}catch(e){}
+  var ph=cfg.e.ph(cfg.opts).map(function(p){return {w:p[0],d:p[1]*1000,k:p[2],t:p[2]==='in'?(p[3]||BR_MAX):p[2]==='out'?BR_MIN:null}});
+  var cyc=0;ph.forEach(function(p){cyc+=p.d});
+  var n=cfg.dur.c||Math.max(1,Math.round(cfg.dur.s*1000/cyc));
+  var r={el:el,cfg:cfg,ph:ph,cyc:cyc,n:n,total:cyc*n,lead:3000,t0:performance.now(),paused:0,pAt:null,last:-1,done:false};
+  BR.run=r;el.ring.classList.remove('hold');el.word.classList.remove('sm');el.disc.style.transform='scale('+BR_MIN+')';
+  el.pause.textContent='Pause';
+  requestAnimationFrame(brTick);
+}
+function brTick(now){
+  var r=BR.run;if(!r||r.done)return;
+  if(r.pAt!==null){requestAnimationFrame(brTick);return;}
+  var el=r.el,t=now-r.t0-r.paused;
+  if(t<r.lead){el.word.textContent='Prêt';el.word.classList.add('sm');el.count.textContent=Math.ceil((r.lead-t)/1000);
+    el.status.textContent='Posez le dos, relâchez les épaules';requestAnimationFrame(brTick);return;}
+  el.word.classList.remove('sm');t-=r.lead;
+  if(t>=r.total){brFinish();return;}
+  var ci=Math.floor(t/r.cyc),rem=t-ci*r.cyc,pi=0;
+  while(rem>=r.ph[pi].d){rem-=r.ph[pi].d;pi++;}
+  var p=r.ph[pi],from=BR_MIN;
+  for(var i=0;i<pi;i++)if(r.ph[i].t!==null)from=r.ph[i].t;
+  var to=p.t===null?from:p.t;
+  el.disc.style.transform='scale('+(from+(to-from)*brEase(rem/p.d))+')';
+  var key=ci*100+pi;
+  if(key!==r.last){r.last=key;el.word.textContent=p.w;el.ring.classList.toggle('hold',p.k==='hold');brTone(p.k,r.cfg.snd,r.cfg.vib);}
+  el.count.textContent=Math.min(Math.floor(rem/1000)+1,Math.round(p.d/1000));
+  if(r.cfg.dur.c)el.status.textContent=(r.cfg.e.lab||'Cycle')+' '+(ci+1)+' sur '+r.n;
+  else{var s=Math.ceil((r.total-t)/1000);el.status.textContent='Encore '+Math.floor(s/60)+' min '+(s%60<10?'0':'')+(s%60);}
+  requestAnimationFrame(brTick);
+}
+function brFinish(){var r=BR.run;r.done=true;brTone('end',r.cfg.snd,r.cfg.vib);var el=r.el;
+  el.disc.style.transform='scale('+BR_MIN+')';el.ring.classList.remove('hold');
+  el.word.textContent='Respirez normalement';el.word.classList.add('sm');el.count.textContent='';
+  el.status.textContent='C’est la répétition qui fait le lien.';el.pause.textContent='Recommencer';
+  try{BR.wake&&BR.wake.release()}catch(e){}BR.wake=null;}
+function brPause(){var r=BR.run;if(!r)return;
+  if(r.done){brStart(r.el,r.cfg);return;}
+  if(r.pAt===null){r.pAt=performance.now();r.el.pause.textContent='Reprendre';r.el.status.textContent='En pause';}
+  else{r.paused+=performance.now()-r.pAt;r.pAt=null;r.el.pause.textContent='Pause';}}
+function brStop(){if(BR.run)BR.run.done=true;BR.run=null;try{BR.wake&&BR.wake.release()}catch(e){}BR.wake=null;}
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&BR.run&&!BR.run.done){try{navigator.wakeLock.request('screen').then(function(w){BR.wake=w}).catch(function(){})}catch(e){}}});
+
+/* ---------- Volet trac ---------- */
+var TR_OPT={},TR_DUR=null,TR_SND=false,TR_VIB=false;
+function trRow(e){return '<div class="card trrow" role="button" tabindex="0" onclick="trOpen(\''+e.id+'\')"><div><div class="trn">'+e.n+'</div><div class="muted" style="font-size:13px">'+e.rh(brDef(e))+'</div></div><span class="trgo" aria-hidden="true"><svg viewBox="0 0 10 12"><path d="M0 0l10 6-10 6z"/></svg></span></div>';}
+function rTrac(s){
+  var alone=S.scr==='trac';
+  if(alone)$('nav').innerHTML='';
+  var inst='';
+  if(!STANDALONE){
+    if(IS_IOS)inst='<button class="btn bs" onclick="iosHelp()">Installer sur mon téléphone</button>';
+    else inst='<button class="btn bs" id="installBtn" style="display:'+(deferredPrompt?'block':'none')+'" onclick="doInstall()">Installer sur mon téléphone</button>';
+  }
+  s.innerHTML='<div class="pad fi"><div style="height:18px"></div>'+
+  '<p class="lbl" style="margin-bottom:6px">Volet trac</p>'+
+  '<h2 style="font-size:28px;line-height:1.1;margin-bottom:10px">Gérer le trac</h2>'+
+  '<p class="muted" style="margin:0 0 18px">Les respirations et le rituel du livret <i>Gérer le trac, ça se travaille</i>. Choisissez un exercice et suivez le cercle : il grossit quand vous inspirez, rétrécit quand vous expirez, change de couleur quand vous retenez.</p>'+
+  '<h3 class="trh">Juste avant la scène</h3>'+
+  BREX.filter(function(e){return e.g==='avant'}).map(trRow).join('')+
+  '<div class="card"><div class="trn" style="margin-bottom:8px">Le rituel de coulisses</div>'+
+  '<p style="font-size:13.5px;color:#5f5a4d;line-height:1.65;margin:0">Toujours le même, toujours dans le même ordre.<br><b>Un geste du corps :</b> rouler les épaules, poser les pieds, un soupir double.<br><b>Un point d’attention :</b> une phrase vraie, une note, un objet dans la poche.<br><b>L’ancre :</b> pouce contre index, dix secondes, juste avant d’entrer.</p></div>'+
+  '<h3 class="trh">Au quotidien</h3>'+
+  BREX.filter(function(e){return e.g==='quot'}).map(trRow).join('')+
+  '<div class="note" style="margin:14px 0">Le livret complet, avec tous les exercices et les études qui les fondent, est sur <a href="https://yannriguidelhypnose.fr/trac/" target="_blank" rel="noopener" style="color:inherit">yannriguidelhypnose.fr/trac</a>.</div>'+
+  inst+
+  (alone?'<button class="btn bp" onclick="go(\'w\')">Découvrir le programme Micro-gestes</button>':'')+
+  '</div>';
+}
+function trChips(lab,vals,sel,fn){
+  return '<p class="lbl" style="margin:14px 0 8px">'+lab+'</p><div class="trchips">'+vals.map(function(v,i){
+    return '<button class="trchip'+(i===sel?' on':'')+'" onclick="'+fn+'('+i+',this)">'+v+'</button>';}).join('')+'</div>';
+}
+function trPick(btn){var p=btn.parentNode.querySelectorAll('.trchip');for(var i=0;i<p.length;i++)p[i].classList.remove('on');btn.classList.add('on');}
+function trSetX(i,b){var e=brFind(TR_CUR);TR_OPT[e.extra.key]=e.extra.vals[i][0];trPick(b);}
+function trSetD(i,b){TR_DUR=brFind(TR_CUR).dur[i][1];trPick(b);}
+var TR_CUR=null;
+function trOpen(id){
+  var e=brFind(id);TR_CUR=id;TR_OPT=brDef(e);TR_DUR=e.dur[e.dd||0][1];
+  var h='<p style="font-size:14px;line-height:1.6;margin:0 0 8px">'+e.how+'</p><p class="muted" style="font-size:13px;margin:0">'+e.why+'</p>';
+  if(e.extra)h+=trChips(e.extra.lab,e.extra.vals.map(function(v){return v[1]}),e.extra.def,'trSetX');
+  if(e.dur.length>1)h+=trChips('Durée',e.dur.map(function(v){return v[0]}),e.dd||0,'trSetD');
+  h+='<div class="trtog"><label><input type="checkbox" id="trSnd"'+(TR_SND?' checked':'')+'> Son à chaque temps</label><label><input type="checkbox" id="trVib"'+(TR_VIB?' checked':'')+'> Vibration</label></div>'+
+  '<button class="btn bp" style="margin-top:16px" onclick="trGo()">Commencer</button>';
+  var o=sheet('ovT','Respirer',e.n,h);o.style.position='fixed';o.style.left='0';o.style.right='0';o.style.margin='0 auto';o.style.maxWidth='420px';
+}
+function trGo(){
+  TR_SND=$('trSnd').checked;TR_VIB=$('trVib').checked;closeOv('ovT');
+  var e=brFind(TR_CUR),ov=document.createElement('div');ov.className='trp';ov.id='ovP';
+  ov.innerHTML='<div class="trpt">'+e.n+'</div><div class="trstage"><div class="trring" id="trRing"><div class="trdisc" id="trDisc"></div><div class="trin"><div class="trw" id="trW" aria-live="polite"></div><div class="trc" id="trC"></div></div></div></div>'+
+  '<div class="trst" id="trSt"></div><div class="trbt"><button class="btn bs" onclick="trEnd()">Arrêter</button><button class="btn bp" id="trPa" onclick="brPause()">Pause</button></div>';
+  $('app').appendChild(ov);
+  brStart({disc:$('trDisc'),ring:$('trRing'),word:$('trW'),count:$('trC'),status:$('trSt'),pause:$('trPa')},{e:e,opts:TR_OPT,dur:TR_DUR,snd:TR_SND,vib:TR_VIB});
+}
+function trEnd(){brStop();var o=$('ovP');if(o)o.remove();}
+
+ld();
+if(/^#trac/.test(location.hash)){if(S.scr==='home')S.tab='t';else S.scr='trac';}
+render();
+</script>
+</body>
+</html>
