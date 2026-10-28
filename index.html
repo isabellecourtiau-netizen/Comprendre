@@ -17,10 +17,11 @@
 <meta property="og:description" content="Vingt-huit jours, quelques micro-gestes par jour. Gratuit, sans compte, rien n'est envoyé.">
 <meta property="og:image" content="icon-512.png">
 <meta property="og:type" content="website">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
+@font-face{font-family:'Playfair Display';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/playfair-display-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Playfair Display';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/playfair-display-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/dm-sans-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/dm-sans-latin-500-normal.woff2) format('woff2')}
 :root{--navy:#2A2E42;--cream:#F4F1EA;--surf:#EDE8DC;--surf2:#fff;--gold:#C4973A;--ink:#2A2E42;--muted:#8c8676;--bd:#e3ddd0;
 --C:#0F6E56;--P:#4038A0;--E:#9C5A1F;}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -138,12 +139,113 @@ var CFG={
 };
 
 var S={scr:'w',tab:'j',parcours:null,deg:3,mode:'rdv',day:1,done:[],memos:{},fb:{},fbd:{},releve:{},remind:'08:00',q:[],qi:0,qorder:null,vday:null,qhist:[],seuils:[],fin:0,cycle:1,arch:[]};
-function sv(){try{localStorage.setItem('pp24',JSON.stringify(S))}catch(e){}}
-function ld(){try{var d=JSON.parse(localStorage.getItem('pp24')||'null');if(d&&d.parcours){for(var k in d)S[k]=d[k];S.scr='home';}}catch(e){}
+/* =====================================================================
+   DONNÉES — format versionné (schéma 2)
+   Règles : on n'efface jamais une ancienne clé ; toute conversion passe par
+   MIGR ; on ne remplace jamais des données plus récentes que l'application.
+   ===================================================================== */
+var APP_VERSION='1.0.0', SCHEMA=2, CLE='mg-donnees', CLE_ANCIENNE='pp24';
+/* Champs d'écran : jamais enregistrés ni exportés */
+var EPHEMERES=['scr','tab','q','qi','qorder','vday','again','ans','exaequo','finalistes','second','tour','sc','sc1'];
+/* Champs rangés dans l'enveloppe */
+var RANGES=['persoL','parcours','deg','mode','day','done','memos','fb','fbd','releve','remind','seuils','fin','cycle','arch','qhist'];
+var META={creeLe:null,derniereSauvegarde:null,acces:null,migreDe:null};
+var BLOQUE_ECRITURE=false, ALERTE_DONNEES=null;
+
+function maintenant(){return new Date().toISOString();}
+function copieSecours(nom,valeur){try{if(valeur&&!localStorage.getItem('mg-secours-'+nom))localStorage.setItem('mg-secours-'+nom,valeur);}catch(e){}}
+
+/* Données « à plat » (format de l'application) -> enveloppe schéma 2 */
+function enveloppeDepuis(d,meta){
+  meta=meta||{};var autres={};
+  for(var k in d){if(EPHEMERES.indexOf(k)<0&&RANGES.indexOf(k)<0)autres[k]=d[k];}
+  return {
+    format:'micro-gestes',schema:SCHEMA,appVersion:APP_VERSION,
+    creeLe:meta.creeLe||maintenant(),modifieLe:maintenant(),migreDe:meta.migreDe||null,
+    acces:meta.acces||null,
+    reglages:{rythme:d.mode||'rdv',heureRdv:d.remind||'08:00',degre:d.deg||3,derniereSauvegarde:meta.derniereSauvegarde||null},
+    cycleEnCours:{numero:d.cycle||1,parcours:d.parcours||null,jour:d.day||1,
+      gestesFaits:Array.isArray(d.done)?d.done:[],notes:d.memos||{},
+      avisGestes:d.fb||{},avisGestesJour:d.fbd||{},releve:d.releve||{},
+      passagesVus:Array.isArray(d.seuils)?d.seuils:[],fin:d.fin||0},
+    cyclesArchives:Array.isArray(d.arch)?d.arch:[],
+    questionnaires:Array.isArray(d.qhist)?d.qhist:[],
+    selectionPerso:d.persoL||null,
+    autres:autres
+  };
+}
+/* Enveloppe schéma 2 -> données « à plat » */
+function aplatir(e){
+  var c=e.cycleEnCours||{},r=e.reglages||{},d={};
+  var a=e.autres||{};for(var k in a)d[k]=a[k];
+  d.parcours=c.parcours||null;d.day=c.jour||1;d.done=c.gestesFaits||[];d.memos=c.notes||{};
+  d.fb=c.avisGestes||{};d.fbd=c.avisGestesJour||{};d.releve=c.releve||{};d.seuils=c.passagesVus||[];
+  d.fin=c.fin||0;d.cycle=c.numero||1;d.arch=e.cyclesArchives||[];d.qhist=e.questionnaires||[];
+  d.mode=r.rythme||'rdv';d.remind=r.heureRdv||'08:00';d.deg=r.degre||3;
+  if(e.selectionPerso)d.persoL=e.selectionPerso;
+  return d;
+}
+/* Chaîne de migrations : MIGR[n] transforme le schéma n en schéma n+1.
+   Schéma 1 = l'ancien format « pp24 » (données à plat, sans version). */
+var MIGR={
+  1:function(e){return enveloppeDepuis(e.donnees||{},{migreDe:e.migreDe||'pp24'});}
+};
+function migrer(e){
+  while(e.schema<SCHEMA){
+    if(!MIGR[e.schema])throw new Error('Migration manquante depuis le schéma '+e.schema);
+    if(e.schema>1)copieSecours('schema-'+e.schema,JSON.stringify(e));
+    var creeLe=e.creeLe;e=MIGR[e.schema](e);if(creeLe)e.creeLe=creeLe;
+  }
+  return e;
+}
+function appliquer(e){
+  var d=aplatir(e);for(var k in d)S[k]=d[k];
+  META.creeLe=e.creeLe||null;META.acces=e.acces||null;META.migreDe=e.migreDe||null;
+  META.derniereSauvegarde=(e.reglages&&e.reglages.derniereSauvegarde)||null;
+  if(S.parcours)S.scr='home';
+}
+function enveloppeActuelle(){return enveloppeDepuis(S,META);}
+function sv(){
+  if(BLOQUE_ECRITURE)return;
+  try{var e=enveloppeActuelle();META.creeLe=e.creeLe;localStorage.setItem(CLE,JSON.stringify(e));}catch(err){}
+}
+function ld(){
+  var brut=null,e=null;
+  try{brut=localStorage.getItem(CLE);}catch(err){}
+  try{
+    if(brut){
+      e=JSON.parse(brut);
+      if(!e||e.format!=='micro-gestes'||typeof e.schema!=='number')throw new Error('format inconnu');
+      if(e.schema>SCHEMA){
+        /* Données venant d'une version plus récente : on ne les écrase pas. */
+        BLOQUE_ECRITURE=true;
+        ALERTE_DONNEES='Vos données viennent d’une version plus récente de l’application. Rechargez la page avec une connexion pour la mettre à jour. Rien n’a été modifié.';
+      }else if(e.schema<SCHEMA){copieSecours('schema-'+e.schema,brut);e=migrer(e);}
+    }else{
+      var ancien=null;try{ancien=localStorage.getItem(CLE_ANCIENNE);}catch(err){}
+      if(ancien){
+        copieSecours(CLE_ANCIENNE,ancien); /* l'ancienne clé reste aussi en place */
+        var d=JSON.parse(ancien);
+        if(d&&d.parcours)e=migrer({schema:1,donnees:d,migreDe:CLE_ANCIENNE});
+      }
+    }
+    if(e&&!BLOQUE_ECRITURE){appliquer(e);sv();}
+    else if(e){appliquer(e);}
+  }catch(err){
+    /* Échec : on garde tout intact et on prévient, au lieu de repartir de zéro. */
+    BLOQUE_ECRITURE=true;
+    if(brut)copieSecours('illisible-'+Date.now(),brut);
+    ALERTE_DONNEES='Vos données n’ont pas pu être lues. Elles sont conservées sur ce téléphone, rien n’a été effacé. Vous pouvez restaurer une sauvegarde depuis les Réglages.';
+  }
   S.vday=null;
   if(!S.seuils)S.seuils=[];if(!S.fbd)S.fbd={};if(!S.releve)S.releve={};if(!S.arch)S.arch=[];if(!S.cycle)S.cycle=1;
   if(S.persoL&&S.persoL.C){IND.perso={lb:'Votre sélection',sl:'Vos gestes retenus',sym:0,C:S.persoL.C,P:S.persoL.P,E:S.persoL.E};}
-  if(S.parcours&&!IND[S.parcours])S.parcours='sur';}
+  if(S.parcours&&!IND[S.parcours])S.parcours='sur';
+}
+/* Demande au navigateur de ne pas effacer les données (stockage durable) */
+function demanderStockageDurable(){
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persisted().then(function(ok){if(!ok)navigator.storage.persist();});}catch(e){}
+}
 
 var G={
 C02:{n:'Respiration ventrale',a:'C',c:'Une main sur le ventre. Inspirez par le nez en gonflant le ventre, expirez lentement par la bouche, plus longuement.',d:'1–2 min',br:1},
@@ -541,6 +643,7 @@ function makeCode(){try{return btoa(unescape(encodeURIComponent(JSON.stringify(s
 function restoreCode(str){
   try{
     str=(str||'').trim();if(!str)return false;
+    try{var avant=localStorage.getItem(CLE);if(avant)localStorage.setItem('mg-secours-avant-restauration',avant);}catch(e){}
     var d=JSON.parse(decodeURIComponent(escape(atob(str))));
     if(d&&d.persoL&&d.persoL.C){IND.perso={lb:'Votre sélection',sl:'Vos gestes retenus',sym:0,C:d.persoL.C,P:d.persoL.P,E:d.persoL.E};}
     if(!d||!d.parcours||!IND[d.parcours])return false;
@@ -550,7 +653,7 @@ function restoreCode(str){
     S.fbd=d.fbd||{};S.releve=d.releve||{};S.cycle=d.cycle||1;S.arch=Array.isArray(d.arch)?d.arch:[];
     if(Array.isArray(d.qhist))S.qhist=d.qhist;
     if(d.persoL&&d.persoL.C)S.persoL=d.persoL;
-    S.scr='home';S.tab='j';sv();return true;
+    BLOQUE_ECRITURE=false;ALERTE_DONNEES=null;S.scr='home';S.tab='j';sv();return true;
   }catch(e){return false;}
 }
 function doRestore(){var el=$('codeIn');if(restoreCode(el?el.value:'')){render();toast('Parcours restauré.');}else{toast('Ce code n’est pas reconnu.');}}
@@ -1011,14 +1114,19 @@ function rReglages(s){
   '<div class="sep"></div><p class="lbl" style="margin-bottom:10px">Vos notes</p>'+
   '<div class="card"><p style="font-size:13px;color:#5f5a4d;line-height:1.6;margin:0 0 10px">Vos notes et la trace de vos gestes, à garder pour vous.</p>'+
   '<div class="gact"><button class="mini" onclick="exportNotes(\'txt\')">Exporter .txt</button><button class="mini" onclick="exportNotes(\'md\')">Exporter .md</button></div></div>'+
+  '<div class="sep"></div><p class="lbl" style="margin-bottom:10px">Sauvegarde</p>'+
+  '<div class="card"><p style="font-size:13px;color:#5f5a4d;line-height:1.6;margin:0 0 10px">Un fichier qui contient tout\u202F: parcours, jours, notes, relevés. Rangez-le où vous voulez (Fichiers, Drive…) pour retrouver vos données sur un nouveau téléphone ou après un effacement.</p>'+
+  '<p class="muted" style="font-size:12.5px;margin:0 0 10px">'+texteDerniereSauvegarde()+'</p>'+
+  '<div class="gact"><button class="mini g" onclick="enregistrerSauvegarde()">Enregistrer une sauvegarde</button><button class="mini" onclick="choisirSauvegarde()">Restaurer une sauvegarde</button></div></div>'+
   '<div class="sep"></div><p class="lbl" style="margin-bottom:10px">Code de reprise</p>'+
-  '<div class="card"><p style="font-size:13px;color:#5f5a4d;line-height:1.6;margin:0 0 10px">Certains navigateurs effacent vos données à la fermeture. Gardez ce code ailleurs (une note, un mail)\u202F: il restaure votre parcours, votre jour et vos notes — ici ou sur un autre appareil.</p>'+
+  '<div class="card"><p style="font-size:13px;color:#5f5a4d;line-height:1.6;margin:0 0 10px">Autre méthode, plus ancienne\u202F: ce code restaure votre parcours, ici ou sur un autre appareil. Il contient vos notes en clair\u202F: gardez-le pour vous, dans un endroit privé.</p>'+
   '<textarea id="codeOut" rows="3" readonly onclick="this.select()" style="font-size:12px">'+makeCode()+'</textarea>'+
   '<button class="mini" style="margin-top:8px" onclick="copyCode()">Copier mon code</button></div>'+
   inst+
   '<div class="sep"></div><p class="lbl" style="margin-bottom:10px">À propos</p>'+
   '<div class="card"><p style="font-size:13px;color:#5f5a4d;line-height:1.7;margin:0 0 12px">Micro-gestes est une application gratuite, sans compte et sans publicité, conçue par <b>Yann Riguidel</b>, praticien en hypnose à '+CFG.ville+'. Elle met en pratique <i>Comprendre ne suffit pas</i>, son livre sur la méthode des micro-gestes.</p>'+
   '<div class="gact"><a class="mini g" href="'+CFG.livre+'" target="_blank" rel="noopener">Le livre</a><a class="mini" href="'+CFG.site+'" target="_blank" rel="noopener">Le cabinet</a><button class="mini" onclick="partager()">Partager</button></div></div>'+
+  '<p class="muted" style="font-size:12px;margin:10px 0 0;text-align:center">Version '+APP_VERSION+' · données au format '+SCHEMA+'</p>'+
   '<div class="note" style="margin-top:10px">Cette application n’est pas un soin et ne remplace pas un avis médical. En cas de souffrance importante, parlez-en à un professionnel de santé.</div>'+
   '<button class="btn bs" style="margin-top:14px" onclick="go(\'pick\')">Changer de parcours</button></div>';
 }
@@ -1040,6 +1148,68 @@ function exportNotes(fmt){
   bloc(S.parcours,S.memos,S.done,S.releve,'Cycle '+S.cycle);
   var blob=new Blob([L.join('\n')],{type:'text/plain;charset=utf-8'}),u=URL.createObjectURL(blob),a=document.createElement('a');
   a.href=u;a.download='micro-gestes-notes.'+(md?'md':'txt');document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u)},800);
+}
+
+/* ---------- Sauvegarde complète (fichier) ---------- */
+function nomFichierSauvegarde(){var d=new Date(),z=function(n){return (n<10?'0':'')+n};return 'micro-gestes-sauvegarde-'+d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())+'.json';}
+function enregistrerSauvegarde(){
+  META.derniereSauvegarde=maintenant();sv();
+  var e=enveloppeActuelle();e.type='sauvegarde';
+  var txt=JSON.stringify(e,null,1),nom=nomFichierSauvegarde();
+  var blob=new Blob([txt],{type:'application/json'});
+  /* Sur téléphone : feuille de partage (Fichiers, Drive, e-mail…). Sinon : téléchargement. */
+  try{
+    var f=new File([blob],nom,{type:'application/json'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){
+      navigator.share({files:[f],title:'Sauvegarde Micro-gestes'}).then(function(){toast('Sauvegarde enregistrée.');rReglages($('scr'));}).catch(function(){});
+      return;
+    }
+  }catch(err){}
+  var u=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=u;a.download=nom;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u)},800);
+  toast('Sauvegarde enregistrée.');rReglages($('scr'));
+}
+function choisirSauvegarde(){
+  var i=document.createElement('input');i.type='file';i.accept='.json,application/json';
+  i.onchange=function(){var f=i.files&&i.files[0];if(!f)return;var r=new FileReader();
+    r.onload=function(){lireSauvegarde(String(r.result||''));};r.readAsText(f);};
+  i.click();
+}
+var SAUV_EN_ATTENTE=null;
+function lireSauvegarde(txt){
+  var e;
+  try{e=JSON.parse(txt);}catch(err){toast('Ce fichier n’est pas une sauvegarde Micro-gestes.');return;}
+  if(!e||e.format!=='micro-gestes'||typeof e.schema!=='number'){toast('Ce fichier n’est pas une sauvegarde Micro-gestes.');return;}
+  if(e.schema>SCHEMA){toast('Cette sauvegarde vient d’une version plus récente. Mettez l’application à jour.');return;}
+  try{e=migrer(e);}catch(err){toast('Cette sauvegarde n’a pas pu être lue.');return;}
+  var c=e.cycleEnCours||{},nbNotes=0,k;
+  for(k in (c.notes||{}))if(String(c.notes[k]||'').trim())nbNotes++;
+  (e.cyclesArchives||[]).forEach(function(a){for(var j in (a.memos||{}))if(String(a.memos[j]||'').trim())nbNotes++;});
+  var quand=e.modifieLe?new Date(e.modifieLe).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}):'date inconnue';
+  var parc=(c.parcours&&IND[c.parcours])?IND[c.parcours].lb:'aucun parcours';
+  SAUV_EN_ATTENTE=e;
+  sheet('ovR','Restaurer','Remplacer vos données ?',
+    '<div class="card" style="margin-bottom:12px"><p style="font-size:14px;line-height:1.7;margin:0">Sauvegarde du <b>'+quand+'</b><br>'+
+    'Parcours : <b>'+parc+'</b>, jour '+(c.jour||1)+'<br>'+
+    'Cycle '+(c.numero||1)+(e.cyclesArchives&&e.cyclesArchives.length?' ('+e.cyclesArchives.length+' cycle(s) archivé(s))':'')+'<br>'+
+    nbNotes+' note(s)</p></div>'+
+    '<p style="font-size:13px;color:#5f5a4d;line-height:1.6;margin:0 0 12px">Vos données actuelles seront remplacées. Une copie de secours est gardée sur ce téléphone.</p>'+
+    '<button class="btn bp" onclick="confirmerRestauration()">Remplacer par cette sauvegarde</button>','Annuler');
+}
+function confirmerRestauration(){
+  var e=SAUV_EN_ATTENTE;if(!e)return;
+  try{var avant=localStorage.getItem(CLE);if(avant)localStorage.setItem('mg-secours-avant-restauration',avant);}catch(err){}
+  for(var k in S){if(EPHEMERES.indexOf(k)<0&&k!=='persoL')delete S[k];}
+  delete S.persoL;
+  appliquer(e);BLOQUE_ECRITURE=false;ALERTE_DONNEES=null;
+  if(S.persoL&&S.persoL.C){IND.perso={lb:'Votre sélection',sl:'Vos gestes retenus',sym:0,C:S.persoL.C,P:S.persoL.P,E:S.persoL.E};}
+  if(!S.seuils)S.seuils=[];if(!S.fbd)S.fbd={};if(!S.releve)S.releve={};if(!S.arch)S.arch=[];if(!S.cycle)S.cycle=1;
+  if(S.parcours&&!IND[S.parcours])S.parcours='sur';
+  S.tab='j';sv();SAUV_EN_ATTENTE=null;closeOv('ovR');render();toast('Données restaurées.');
+}
+function texteDerniereSauvegarde(){
+  if(!META.derniereSauvegarde)return 'Aucune sauvegarde enregistrée pour l’instant.';
+  return 'Dernière sauvegarde : '+new Date(META.derniereSauvegarde).toLocaleDateString('fr-FR',{day:'numeric',month:'long'})+'.';
 }
 
 /* ---------- Overlays ---------- */
@@ -1231,6 +1401,8 @@ function trGo(){
 function trEnd(){brStop();var o=$('ovP');if(o)o.remove();}
 
 ld();
+demanderStockageDurable();
+if(ALERTE_DONNEES)setTimeout(function(){toast(ALERTE_DONNEES);},600);
 if(/^#trac/.test(location.hash)){if(S.scr==='home')S.tab='t';else S.scr='trac';}
 render();
 </script>
