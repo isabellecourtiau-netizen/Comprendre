@@ -146,7 +146,7 @@ var S={scr:'w',tab:'j',parcours:null,deg:3,mode:'rdv',day:1,done:[],memos:{},fb:
    Règles : on n'efface jamais une ancienne clé ; toute conversion passe par
    MIGR ; on ne remplace jamais des données plus récentes que l'application.
    ===================================================================== */
-var APP_VERSION='1.1.1', SCHEMA=2, CLE='mg-donnees', CLE_ANCIENNE='pp24';
+var APP_VERSION='1.1.2', SCHEMA=2, CLE='mg-donnees', CLE_ANCIENNE='pp24';
 /* Champs d'écran : jamais enregistrés ni exportés */
 var EPHEMERES=['scr','tab','q','qi','qorder','vday','again','ans','exaequo','finalistes','second','tour','sc','sc1'];
 /* Champs rangés dans l'enveloppe */
@@ -641,7 +641,9 @@ function rAide(s){$('nav').innerHTML='';
   '<h2 style="font-size:23px;margin-bottom:16px">Reprendre ou choisir</h2>'+
   '<div class="card"><p style="font-size:13.5px;color:#5f5a4d;margin:0 0 10px;line-height:1.6">Vous savez déjà ce sur quoi vous voulez travailler ? Choisissez directement votre parcours, sans passer par les questions.</p>'+
   '<button class="mini" onclick="exigerAcces(\'pick\')">Voir les douze parcours</button></div>'+
-  '<div class="card"><p style="font-size:13.5px;color:#5f5a4d;margin:0 0 10px;line-height:1.6">Vous aviez commencé sur un autre appareil, ou vos données ont été effacées ? Collez le code de reprise que vous aviez gardé.</p>'+
+  '<div class="card"><p style="font-size:13.5px;color:#5f5a4d;margin:0 0 10px;line-height:1.6">Vous aviez enregistré une sauvegarde\u202F? Choisissez le fichier pour retrouver votre parcours, vos jours et vos notes.</p>'+
+  '<button class="mini g" onclick="choisirSauvegarde()">Restaurer une sauvegarde</button></div>'+
+  '<div class="card"><p style="font-size:13.5px;color:#5f5a4d;margin:0 0 10px;line-height:1.6">Vous aviez gardé un code de reprise\u202F? Collez-le ici.</p>'+
   '<textarea id="codeIn" rows="3" placeholder="Votre code…"></textarea>'+
   '<button class="mini" style="margin-top:8px" onclick="doRestore()">Restaurer mon parcours</button></div>'+
   '<button class="btn bs" style="margin-top:10px" onclick="go(\'w\')">Retour</button></div>';
